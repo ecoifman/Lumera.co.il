@@ -1,0 +1,309 @@
+---
+// "Behind the wall": the signature scroll sequence. A wall section shows the
+// conduits and chiselled channels of a conventional installation, which fade
+// to a ghost while one feed line powers the ceiling track and the switch
+// controls the light over the air. The markup is the final state, so without
+// the motion layer the drawing still tells the whole story.
+interface Props {
+  id?: string;
+  heading?: string;
+  headingLevel?: 'h2' | 'h3';
+  ctaHref?: string;
+  ctaLabel?: string;
+}
+const {
+  id = 'how-it-works',
+  heading = 'מה קורה מאחורי הקיר',
+  headingLevel: H = 'h2',
+  ctaHref = '/infrastructure/',
+  ctaLabel = 'התשתית של לומרה לעומק',
+} = Astro.props;
+
+const lamps = [290, 500, 710];
+const spots = [300, 420, 540, 660];
+---
+
+<section class="xray surface-dark" id={id} aria-labelledby={`${id}-title`} data-xray>
+  <div class="xray__pin" data-xray-pin>
+    <div class="wrap xray__grid">
+      <div class="xray__text">
+        <H id={`${id}-title`} class="xray__title display-3" data-reveal="lines">{heading}</H>
+        <ol class="xray__steps">
+          <li class="xray__step" data-xray-step>
+            <h3>בבית רגיל</h3>
+            <p>מכל מתג יוצאת צנרת לתקרה, ומכל מנורה חוזרים חוטים אל המתג. כל נקודת שליטה חדשה מתחילה בחציבה בקיר.</p>
+          </li>
+          <li class="xray__step" data-xray-step>
+            <h3>בבית של לומרה</h3>
+            <p>קו הזנה אחד מוביל את החשמל ישירות לגופי התאורה בתקרה. בלי צנרת שיורדת אל המתגים.</p>
+          </li>
+          <li class="xray__step" data-xray-step>
+            <h3>השליטה עוברת באוויר</h3>
+            <p>המתג משדר אלחוטית לתאורה, לתריסים ולמזגן. לכן אפשר למקם אותו בכל נקודה על הקיר, ולהזיז אותו כשהרהיטים זזים.</p>
+          </li>
+        </ol>
+        <a class="link-line xray__cta" href={ctaHref}>{ctaLabel}</a>
+      </div>
+
+      <figure class="xray__figure">
+        <svg
+          class="xray__svg"
+          viewBox="0 -8 1000 648"
+          role="img"
+          aria-labelledby={`${id}-svg-title ${id}-svg-desc`}
+        >
+          <title id={`${id}-svg-title`}>חתך של קיר ותקרה: התקנה רגילה מול לומרה</title>
+          <desc id={`${id}-svg-desc`}>
+            בהתקנה רגילה צינורות עוברים בתוך חריצים חצובים בקיר מהמתג אל התקרה ואל כל מנורה. בלומרה קו הזנה אחד מגיע מלוח החשמל אל פס התאורה בתקרה, והמתג שולט באור באלחוט.
+          </desc>
+          <defs>
+            <pattern id={`${id}-hatch`} width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="8" stroke="currentColor" stroke-width="2" opacity="0.55"></line>
+            </pattern>
+            <linearGradient id={`${id}-cone`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#ffb36b" stop-opacity="0.75"></stop>
+              <stop offset="1" stop-color="#ffb36b" stop-opacity="0"></stop>
+            </linearGradient>
+            <filter id={`${id}-glow`} x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="5" result="b"></feGaussianBlur>
+              <feMerge>
+                <feMergeNode in="b"></feMergeNode>
+                <feMergeNode in="SourceGraphic"></feMergeNode>
+              </feMerge>
+            </filter>
+          </defs>
+
+          <!-- Room shell: ceiling slab, wall and floor -->
+          <g class="xr-shell">
+            <rect x="40" y="36" width="920" height="40" rx="2" class="xr-ceiling"></rect>
+            <rect x="40" y="76" width="920" height="520" class="xr-wall"></rect>
+            <line x1="40" y1="596" x2="960" y2="596" class="xr-floor"></line>
+            <rect x="96" y="408" width="64" height="96" rx="4" class="xr-panel"></rect>
+            <line x1="108" y1="430" x2="148" y2="430" class="xr-panel-detail"></line>
+            <line x1="108" y1="446" x2="148" y2="446" class="xr-panel-detail"></line>
+            <line x1="108" y1="462" x2="148" y2="462" class="xr-panel-detail"></line>
+            <text x="128" y="530" class="xr-label" text-anchor="middle">לוח חשמל</text>
+          </g>
+
+          <!-- Conventional installation -->
+          <g class="xr-trad" data-xr-group="trad">
+            <rect x="838" y="84" width="22" height="300" class="xr-chisel" fill={`url(#${id}-hatch)`} data-xr="chisel"></rect>
+            {lamps.map((x) => <circle cx={x} cy="92" r="11" class="xr-trad-lamp" data-xr="trad-lamp"></circle>)}
+            <path d="M128 408 V92 H849" class="xr-trad-line" data-xr="trad-line"></path>
+            <path d="M849 92 V388" class="xr-trad-line" data-xr="trad-line"></path>
+            <path d="M843 92 V388" class="xr-trad-line" data-xr="trad-line"></path>
+            <path d="M855 92 V388" class="xr-trad-line" data-xr="trad-line"></path>
+            {lamps.map((x) => <path d={`M${x} 92 V108`} class="xr-trad-line" data-xr="trad-line"></path>)}
+            <text x="910" y="250" class="xr-label xr-label--trad" text-anchor="middle">חציבה</text>
+          </g>
+
+          <!-- Lumera: one feed to the ceiling track, wireless control from the switch -->
+          <g class="xr-lumera" data-xr-group="lumera">
+            <rect x="220" y="70" width="560" height="7" rx="3.5" class="xr-track" data-xr="track"></rect>
+            <path d="M128 408 V73 H220" class="xr-feed" filter={`url(#${id}-glow)`} data-xr="feed"></path>
+            {
+              spots.map((x) => (
+                <g data-xr="spot">
+                  <polygon points={`${x - 9},104 ${x + 9},104 ${x + 70},520 ${x - 70},520`} fill={`url(#${id}-cone)`} class="xr-cone" data-xr="cone"></polygon>
+                  <rect x={x - 9} y="77" width="18" height="27" rx="3" class="xr-spot"></rect>
+                </g>
+              ))
+            }
+            <g class="xr-waves">
+              <path d="M820 372 A 44 44 0 0 1 864 328" class="xr-wave" data-xr="wave"></path>
+              <path d="M800 372 A 64 64 0 0 1 864 308" class="xr-wave" data-xr="wave"></path>
+              <path d="M780 372 A 84 84 0 0 1 864 288" class="xr-wave" data-xr="wave"></path>
+            </g>
+            <text x="500" y="24" class="xr-label xr-label--lumera" text-anchor="middle">פס צבירה מגנטי בתקרה</text>
+          </g>
+
+          <!-- The switch (shared by both states) -->
+          <g class="xr-switch">
+            <rect x="830" y="380" width="40" height="64" rx="7" class="xr-switch-body"></rect>
+            <rect x="835" y="386" width="30" height="40" rx="4" class="xr-switch-screen"></rect>
+            <rect x="835" y="386" width="30" height="40" rx="4" class="xr-switch-glow" filter={`url(#${id}-glow)`} data-xr="screen-glow"></rect>
+          </g>
+        </svg>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<style>
+  .xray {
+    --xr-line: rgb(230 230 225 / 0.55);
+    overflow: hidden;
+  }
+  .xray__pin {
+    min-height: 100vh;
+    min-height: 100svh;
+    display: grid;
+    align-items: center;
+    padding-block: calc(var(--header-h) + 2rem) 3rem;
+  }
+  .xray__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: center;
+  }
+  .xray__title {
+    margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+  }
+  .xray__steps {
+    display: grid;
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+  }
+  .xray__step {
+    position: relative;
+    padding-inline-start: 2.75rem;
+    transition: opacity 0.5s var(--ease-out);
+  }
+  .xray__step::before {
+    counter-increment: step;
+    content: counter(step);
+    position: absolute;
+    inset-inline-start: 0;
+    top: 0.1rem;
+    display: grid;
+    place-items: center;
+    width: 1.85rem;
+    height: 1.85rem;
+    border: 1px solid var(--line-on-dark);
+    border-radius: 50%;
+    font-size: 0.85rem;
+    transition:
+      border-color 0.5s var(--ease-out),
+      box-shadow 0.5s var(--ease-out),
+      color 0.5s var(--ease-out);
+  }
+  .xray__step h3 {
+    font-size: var(--step-1);
+    font-weight: 500;
+  }
+  .xray__step p {
+    margin-top: 0.35rem;
+    color: var(--stone-on-dark);
+    max-width: 30em;
+  }
+  .xray.is-animated .xray__step:not(.is-active) {
+    opacity: 0.32;
+  }
+  .xray .xray__step.is-active::before {
+    border-color: var(--lumen);
+    color: var(--lumen);
+    box-shadow: 0 0 16px var(--lumen-glow);
+  }
+  .xray__cta {
+    margin-top: 2rem;
+  }
+
+  .xray__figure {
+    margin: 0;
+  }
+  .xray__svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    color: var(--stone-on-dark);
+  }
+  .xray__svg :global(.xr-ceiling) {
+    fill: var(--glass-3);
+  }
+  .xray__svg :global(.xr-wall) {
+    fill: var(--glass-2);
+  }
+  .xray__svg :global(.xr-floor) {
+    stroke: var(--line-on-dark);
+    stroke-width: 2;
+  }
+  .xray__svg :global(.xr-panel) {
+    fill: none;
+    stroke: var(--xr-line);
+    stroke-width: 1.5;
+  }
+  .xray__svg :global(.xr-panel-detail) {
+    stroke: var(--xr-line);
+    stroke-width: 1;
+  }
+  .xray__svg :global(.xr-label) {
+    fill: var(--stone-on-dark);
+    font-family: var(--font-text);
+    font-size: 15px;
+    direction: rtl;
+  }
+  .xray__svg :global(.xr-label--lumera) {
+    fill: var(--lumen);
+  }
+  /* Final (static) state: the conventional layer is a ghost */
+  .xray__svg :global(.xr-trad) {
+    opacity: 0.18;
+  }
+  .xray__svg :global(.xr-chisel) {
+    stroke: var(--xr-line);
+    stroke-dasharray: 4 4;
+  }
+  .xray__svg :global(.xr-trad-line) {
+    fill: none;
+    stroke: var(--plaster);
+    stroke-width: 2;
+  }
+  .xray__svg :global(.xr-trad-lamp) {
+    fill: none;
+    stroke: var(--plaster);
+    stroke-width: 2;
+  }
+  .xray__svg :global(.xr-track) {
+    fill: #0e1112;
+    stroke: var(--lumen);
+    stroke-width: 1;
+  }
+  .xray__svg :global(.xr-feed) {
+    fill: none;
+    stroke: var(--lumen);
+    stroke-width: 2.5;
+  }
+  .xray__svg :global(.xr-spot) {
+    fill: var(--plaster);
+  }
+  .xray__svg :global(.xr-cone) {
+    mix-blend-mode: screen;
+  }
+  .xray__svg :global(.xr-wave) {
+    fill: none;
+    stroke: var(--lumen);
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+  .xray__svg :global(.xr-switch-body) {
+    fill: #0e1112;
+    stroke: var(--plaster);
+    stroke-width: 1.5;
+  }
+  .xray__svg :global(.xr-switch-screen) {
+    fill: #2a2016;
+  }
+  .xray__svg :global(.xr-switch-glow) {
+    fill: var(--lumen);
+    opacity: 0.55;
+  }
+
+  @media (max-width: 64rem) {
+    .xray__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .xray__figure {
+      order: -1;
+    }
+    .xray.is-animated .xray__step:not(.is-active) {
+      display: none;
+    }
+    .xray__pin {
+      padding-block: calc(var(--header-h) + 1rem) 2rem;
+    }
+  }
+</style>

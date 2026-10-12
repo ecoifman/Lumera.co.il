@@ -1,0 +1,208 @@
+---
+// Shared layout for solution and professional pages:
+// a dark hero with the page's H1, the page's own sections in the slot,
+// features, FAQ (with matching FAQPage data) and the closing contact block.
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Base from './Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Faq, { type FaqItem } from '../components/Faq.astro';
+import ContactCta from '../components/ContactCta.astro';
+import Icon from '../components/Icon.astro';
+import type { Crumb } from '../components/Seo.astro';
+import { faqSchema, serviceSchema } from '../data/schema';
+import { whatsappLink } from '../data/site';
+
+export interface Feature {
+  title: string;
+  text: string;
+}
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  h1: string;
+  lead: string;
+  crumbs: Crumb[];
+  image?: ImageMetadata;
+  imageAlt?: string;
+  features?: Feature[];
+  featuresTitle?: string;
+  faq?: FaqItem[];
+  service?: { name: string; serviceType: string };
+  whatsappMessage: string;
+  ctaTitle?: string;
+  ctaText?: string;
+}
+
+const {
+  title,
+  description,
+  path,
+  h1,
+  lead,
+  crumbs,
+  image,
+  imageAlt = '',
+  features = [],
+  featuresTitle = 'מה מקבלים',
+  faq = [],
+  service,
+  whatsappMessage,
+  ctaTitle,
+  ctaText,
+} = Astro.props;
+
+const schema = [
+  ...(service ? [serviceSchema({ name: service.name, serviceType: service.serviceType, description, path })] : []),
+  ...(faq.length ? [faqSchema(faq, path)] : []),
+];
+---
+
+<Base
+  title={title}
+  description={description}
+  path={path}
+  breadcrumbs={crumbs}
+  schema={schema}
+  overlayHeader
+  whatsappMessage={whatsappMessage}
+>
+  <section class="page-hero surface-dark" data-hero aria-labelledby="page-title">
+    {
+      image && (
+        <div class="page-hero__media" aria-hidden="true">
+          <div class="page-hero__frame" data-hero-media>
+            <Picture src={image} alt={imageAlt} formats={['avif', 'webp']} widths={[640, 960, 1280, 1920]} sizes="100vw" loading="eager" fetchpriority="high" />
+          </div>
+          <div class="page-hero__shade" />
+        </div>
+      )
+    }
+    <div class="wrap page-hero__content">
+      <Breadcrumbs items={crumbs} />
+      <h1 id="page-title" class="page-hero__title" data-hero-title>{h1}</h1>
+      <p class="page-hero__lead" data-hero-after>{lead}</p>
+      <div class="page-hero__actions" data-hero-after>
+        <a class="key" href={whatsappLink(whatsappMessage)} target="_blank" rel="noopener" data-track="whatsapp-pagehero">
+          <Icon name="chat" />
+          ייעוץ בוואטסאפ
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <slot />
+
+  {
+    features.length > 0 && (
+      <section class="features section surface-light" aria-labelledby="features-title">
+        <div class="wrap">
+          <h2 id="features-title" class="display-3 features__title" data-reveal="lines">
+            {featuresTitle}
+          </h2>
+          <ul class="features__list">
+            {features.map((f) => (
+              <li class="features__item">
+                <h3>{f.title}</h3>
+                <p>{f.text}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  <slot name="after-features" />
+
+  {faq.length > 0 && <Faq items={faq} />}
+
+  <ContactCta whatsappMessage={whatsappMessage} title={ctaTitle} text={ctaText} />
+</Base>
+
+<style>
+  .page-hero {
+    position: relative;
+    min-height: min(78vh, 52rem);
+    display: grid;
+    align-items: end;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .page-hero__media {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+  .page-hero__frame {
+    position: absolute;
+    inset: 0;
+  }
+  .page-hero__frame :global(picture),
+  .page-hero__frame :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .page-hero__shade {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to top, rgb(27 31 33 / 0.94) 0%, rgb(27 31 33 / 0.6) 40%, rgb(27 31 33 / 0.15) 75%),
+      linear-gradient(to left, rgb(27 31 33 / 0.55), rgb(27 31 33 / 0) 60%);
+  }
+  .page-hero__content {
+    padding-block: calc(var(--header-h) + 4rem) clamp(3.5rem, 8vh, 6rem);
+  }
+  .page-hero__title {
+    max-width: 14em;
+    margin-top: 1.5rem;
+    font-size: var(--step-5);
+    line-height: 1.05;
+  }
+  .page-hero__lead {
+    max-width: 34em;
+    margin-top: 1.5rem;
+    color: rgb(230 230 225 / 0.85);
+    font-size: var(--step-1);
+    font-weight: 300;
+    line-height: 1.6;
+  }
+  .page-hero__actions {
+    margin-top: 2rem;
+  }
+
+  .features__title {
+    margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
+  }
+  .features__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(2rem, 4vw, 3.5rem) var(--gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .features__item {
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line-on-light);
+  }
+  .features__item h3 {
+    font-size: var(--step-2);
+    font-family: var(--font-display);
+    font-weight: 400;
+    line-height: 1.15;
+  }
+  .features__item p {
+    margin-top: 0.75rem;
+    max-width: 32em;
+    color: var(--stone-on-light);
+  }
+  @media (max-width: 52rem) {
+    .features__list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

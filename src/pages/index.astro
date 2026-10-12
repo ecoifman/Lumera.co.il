@@ -1,0 +1,161 @@
+---
+import Base from '../layouts/Base.astro';
+import HeroHome from '../components/HeroHome.astro';
+import InfraXray from '../components/InfraXray.astro';
+import SwitchShowcase, { type SwitchScreen } from '../components/SwitchShowcase.astro';
+import LightingDimmer from '../components/LightingDimmer.astro';
+import DomainRows, { type DomainRow } from '../components/DomainRows.astro';
+import TrackFork from '../components/TrackFork.astro';
+import ProcessSteps from '../components/ProcessSteps.astro';
+import Faq, { type FaqItem } from '../components/Faq.astro';
+import ContactCta from '../components/ContactCta.astro';
+import { faqSchema } from '../data/schema';
+import { MEDIA } from '../data/media';
+
+const title = 'בית חכם אלחוטי בלי חציבות | מתגים, תאורה ושמע – לומרה';
+const description =
+  'בית חכם אלחוטי, בלי חציבות ובלי תלות ב-Wi‑Fi: מתגי L10 עם מסך בעברית, תאורה מגנטית, שמע מולטירום, אבטחה ואקלים. לייעוץ: 054-236-3473.';
+
+const screens: SwitchScreen[] = MEDIA.switchScreens;
+
+const rows: DomainRow[] = [
+  {
+    id: 'audio',
+    title: 'סאונד בכל חדר, בלי רמקול אחד בעין',
+    text: 'רמקולים שקועים בגבס ובקירות, רמקולים זעירים שיושבים על פסי התאורה המגנטיים, ומערכת מולטירום: מוזיקה אחרת בכל חדר, מהטלפון.',
+    href: '/audio/',
+    linkLabel: 'שמע נסתר ומולטירום',
+    ...MEDIA.domains.audio,
+  },
+  {
+    id: 'security',
+    title: 'אבטחה שרואה, נועלת ומגיבה',
+    text: 'מצלמות חכמות, מנעול ואינטרקום, גלאים שמשתלבים בקיר, וברז ראשי שנסגר לבד כשמתגלה נזילה.',
+    href: '/security/',
+    linkLabel: 'אבטחה ובקרת כניסה',
+    ...MEDIA.domains.security,
+  },
+  {
+    id: 'climate',
+    title: 'הבית מתכוונן לפני שהגעתם',
+    text: 'מזגנים ו־VRF, חימום תת־רצפתי, דוד, בריכה ותריסים, בתזמונים חכמים ובשליטה מכל מקום.',
+    href: '/climate/',
+    linkLabel: 'אקלים, הצללה ואנרגיה',
+    ...MEDIA.domains.climate,
+  },
+];
+
+const faq: FaqItem[] = [
+  {
+    q: 'מה זה בית חכם בלי חציבות?',
+    a: 'בית שבו החשמל מגיע ישירות לגופי התאורה, והשליטה בהם עוברת באלחוט מהמתג או מהטלפון. אין צורך לחצוב בקיר כדי להוסיף מתג או להזיז אותו.',
+  },
+  {
+    q: 'זה מתאים לבית קיים, או רק לבנייה חדשה?',
+    a: 'לשניהם. בבנייה חדשה חוסכים בתשתית כבר בשלב התכנון, ובבית קיים מוסיפים שליטה בלי לפתוח קירות. בשיחת הייעוץ נבדוק מה מתאים לבית שלכם.',
+  },
+  {
+    q: 'מה קורה כשהאינטרנט נופל?',
+    a: 'השליטה בבית לא תלויה ב־Wi‑Fi: המתגים מתקשרים ישירות עם המערכת, והבית ממשיך לעבוד. שליטה מרחוק מהאפליקציה, מחוץ לבית, דורשת חיבור לאינטרנט.',
+  },
+  {
+    q: 'כמה עולה בית חכם של לומרה?',
+    a: 'המחיר תלוי בגודל הבית ובמה שרוצים לשלוט בו. כיוון שאין חציבות ויש פחות צנרת, חלק מעלות התשתית נחסך. אחרי מעבר על תוכנית החשמל תקבלו הצעת מחיר מפורטת.',
+  },
+  {
+    q: 'אפשר לשלוט בבית בקול?',
+    a: 'כן. המערכת עובדת עם Alexa ועם Google Assistant, לצד המתגים על הקיר והאפליקציה.',
+  },
+  {
+    q: 'איפה אתם עובדים?',
+    a: 'המשרד שלנו בחיפה. ספרו לנו איפה הפרויקט, ונתאם מתקין מוסמך באזור.',
+  },
+];
+---
+
+<Base
+  title={title}
+  description={description}
+  path="/"
+  overlayHeader
+  schema={[faqSchema(faq, '/')]}
+  preload={MEDIA.heroPreload}
+  whatsappMessage="היי, הגעתי מדף הבית של לומרה ואשמח לייעוץ לבית חכם"
+>
+  <HeroHome poster={MEDIA.heroPoster} video={MEDIA.heroVideo} />
+
+  <section class="intro section surface-light" aria-labelledby="intro-title">
+    <div class="wrap intro__grid">
+      <h2 id="intro-title" class="intro__statement" data-reveal="lines">
+        עד היום, כל מתג דרש חציבה, צינור וחוטים. בלומרה החשמל הולך ישר לתאורה, והשליטה עוברת באוויר.
+      </h2>
+      <ul class="intro__benefits">
+        <li>
+          <h3>בלי חציבות ולכלוך</h3>
+          <p>נקודת שליטה חדשה לא מתחילה בפטיש. המתג משדר אלחוטית, ולכן אפשר להוסיף אותו או להזיז אותו בלי לפתוח קיר.</p>
+        </li>
+        <li>
+          <h3>פחות תשתית, פחות עלויות</h3>
+          <p>פחות צנרת, פחות נקודות חשמל ופחות שעות עבודה. החיסכון מתחיל כבר בשלב התכנון.</p>
+        </li>
+        <li>
+          <h3>חופש תכנון לאדריכל</h3>
+          <p>מיקום המתגים נקבע לפי העיצוב והרהיטים, ולא לפי הצנרת. התכנון נשאר גמיש גם אחרי שהקירות נסגרו.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <InfraXray />
+
+  <SwitchShowcase screens={screens} />
+
+  <LightingDimmer room={MEDIA.room.image} roomAlt={MEDIA.room.alt} />
+
+  <DomainRows rows={rows} />
+
+  <TrackFork />
+
+  <ProcessSteps />
+
+  <Faq items={faq} />
+
+  <ContactCta whatsappMessage="היי, הגעתי מהאתר של לומרה ואשמח לתכנן בית חכם" />
+</Base>
+
+<style>
+  .intro__grid {
+    display: grid;
+    gap: clamp(3rem, 7vw, 6rem);
+  }
+  .intro__statement {
+    max-width: 19em;
+    font-size: var(--step-4);
+    line-height: 1.16;
+  }
+  .intro__benefits {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .intro__benefits li {
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line-on-light);
+  }
+  .intro__benefits h3 {
+    font-size: var(--step-1);
+  }
+  .intro__benefits p {
+    margin-top: 0.6rem;
+    max-width: 24em;
+    color: var(--stone-on-light);
+  }
+  @media (max-width: 52rem) {
+    .intro__benefits {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

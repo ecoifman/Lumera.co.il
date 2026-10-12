@@ -1,0 +1,62 @@
+---
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import ContactCta from '../components/ContactCta.astro';
+import { SITE } from '../data/site';
+
+const crumbs = [{ name: 'אודות', path: '/about/' }];
+const aboutPage = {
+  '@type': 'AboutPage',
+  '@id': `${SITE.url}/about/#about`,
+  url: `${SITE.url}/about/`,
+  name: 'אודות לומרה',
+  about: { '@id': `${SITE.url}/#business` },
+};
+---
+
+<Base
+  title="אודות לומרה | בית חכם אלחוטי מחיפה"
+  description="לומרה מגדירה מחדש את הבית הישראלי: בית חכם אלחוטי בלי חציבות, שמתוכנן יחד עם האדריכל ומותקן על ידי מתקינים מוסמכים. הכירו את החברה."
+  path="/about/"
+  breadcrumbs={crumbs}
+  schema={[aboutPage]}
+  whatsappMessage="היי, הגעתי מעמוד האודות באתר של לומרה"
+>
+  <section class="about-hero section surface-light" aria-labelledby="about-title">
+    <div class="wrap">
+      <Breadcrumbs items={crumbs} />
+      <h1 id="about-title" class="display-2 about-title" data-reveal="lines">לומרה: הבית בכף היד</h1>
+      <div class="about-body">
+        <p class="lead">
+          לומרה מגדירה מחדש את הסטנדרט לבית הישראלי. אנחנו מחליפים תשתיות מיושנות ויקרות בשליטה אלחוטית ויציבה, שחוסכת זמן ועלויות הקמה, ומשאירה לאדריכל חופש מלא לעצב בלי אילוצים.
+        </p>
+        <p>
+          החברה, {SITE.legalName}, פועלת מחיפה. אנחנו מתכננים את המערכת יחד עם בעלי הבית והאדריכל מול תוכנית החשמל, ומתקינים אותה באמצעות מתקינים מוסמכים שעובדים לפי שיטה מתועדת.
+        </p>
+        <p>
+          הבית נשלט מאפליקציה אחת, מהמתגים על הקיר ובקול: תאורה, תריסים, שמע, אבטחה ואקלים. המטרה פשוטה: בית שמתאים את עצמו לאנשים שגרים בו, ולא להפך.
+        </p>
+      </div>
+    </div>
+  </section>
+  <ContactCta whatsappMessage="היי, הגעתי מעמוד האודות באתר של לומרה" />
+</Base>
+
+<style>
+  .about-hero {
+    padding-top: calc(var(--header-h) + var(--section) * 0.6);
+  }
+  .about-title {
+    margin-top: 1.5rem;
+    max-width: 12em;
+  }
+  .about-body {
+    display: grid;
+    gap: 1.25rem;
+    max-width: 38em;
+    margin-top: clamp(2rem, 5vw, 3.5rem);
+  }
+  .about-body p:not(.lead) {
+    color: var(--stone-on-light);
+  }
+</style>

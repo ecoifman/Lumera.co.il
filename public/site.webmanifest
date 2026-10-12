@@ -1,0 +1,13 @@
+{
+  "name": "לומרה – בית חכם אלחוטי, בלי חציבות",
+  "short_name": "לומרה",
+  "lang": "he",
+  "dir": "rtl",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#1b1f21",
+  "theme_color": "#1b1f21",
+  "icons": [
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

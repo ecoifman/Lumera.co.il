@@ -1,0 +1,406 @@
+@import './fonts.css';
+
+/* ==========================================================================
+   Lumera design tokens
+   Two materials from the product itself: plaster (gypsum ceiling) and glass
+   (the switch face). The only colour is light: --lumen is used for emitted
+   light (glows, the light line, active states), never as decoration.
+   ========================================================================== */
+:root {
+  --glass: #1b1f21;
+  --glass-2: #22282a;
+  --glass-3: #2c3336;
+  --plaster: #e6e6e1;
+  --plaster-2: #dadad3;
+  --stone-on-dark: #8e918c;
+  --stone-on-light: #5f6360;
+  --line-on-dark: rgb(230 230 225 / 0.16);
+  --line-on-light: rgb(27 31 33 / 0.16);
+  --lumen: #ffb36b;
+  --lumen-hot: #ffd2a1;
+  --lumen-glow: rgb(255 179 107 / 0.38);
+  --daylight: #dce7f0;
+
+  --font-display: 'Bellefair', 'Frank Ruhl Libre', 'David', serif;
+  --font-text: 'IBM Plex Sans Hebrew', 'Arial Hebrew', 'Segoe UI', Arial, sans-serif;
+
+  /* Type scale: perfect fourth (1.333) from 17px, fluid on the large steps */
+  --step--1: 0.8125rem;
+  --step-0: 1.0625rem;
+  --step-1: clamp(1.2rem, 1.08rem + 0.55vw, 1.42rem);
+  --step-2: clamp(1.45rem, 1.2rem + 1.05vw, 1.89rem);
+  --step-3: clamp(1.8rem, 1.35rem + 1.9vw, 2.52rem);
+  --step-4: clamp(2.2rem, 1.5rem + 3vw, 3.36rem);
+  --step-5: clamp(2.6rem, 1.6rem + 4.4vw, 4.47rem);
+  --step-6: clamp(3rem, 1.5rem + 6.6vw, 5.96rem);
+
+  --gutter: clamp(1.25rem, 4.5vw, 4.5rem);
+  --max: 88rem;
+  --gap: clamp(1rem, 2.2vw, 2rem);
+  --section: clamp(5rem, 11vw, 10rem);
+
+  --radius-key: 999px;
+  --radius-panel: 22px;
+  --radius-field: 10px;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-dimmer: cubic-bezier(0.65, 0, 0.35, 1);
+  --header-h: 4.75rem;
+}
+
+/* --------------------------------------------------------------------------
+   Reset and base
+   -------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-h) + 1rem);
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--plaster);
+  color: var(--glass);
+  font-family: var(--font-text);
+  font-size: var(--step-0);
+  font-weight: 400;
+  line-height: 1.7;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+}
+
+img,
+video,
+svg,
+picture {
+  display: block;
+  max-width: 100%;
+}
+img,
+video {
+  height: auto;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+h3,
+h4 {
+  font-family: var(--font-text);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 0.22em;
+  text-decoration-thickness: 1px;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+::selection {
+  background: var(--lumen);
+  color: var(--glass);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus, var(--glass));
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+bdi,
+.ltr {
+  unicode-bidi: isolate;
+}
+
+/* --------------------------------------------------------------------------
+   Surfaces: plaster (light) and glass (dark)
+   -------------------------------------------------------------------------- */
+.surface-light {
+  --focus: var(--glass);
+  --text: var(--glass);
+  --muted: var(--stone-on-light);
+  --line: var(--line-on-light);
+  background: var(--plaster);
+  color: var(--glass);
+}
+.surface-dark {
+  --focus: var(--lumen);
+  --text: var(--plaster);
+  --muted: var(--stone-on-dark);
+  --line: var(--line-on-dark);
+  color-scheme: dark;
+  background: var(--glass);
+  color: var(--plaster);
+}
+
+/* --------------------------------------------------------------------------
+   Layout primitives
+   -------------------------------------------------------------------------- */
+.wrap {
+  width: min(100% - 2 * var(--gutter), var(--max));
+  margin-inline: auto;
+}
+
+.section {
+  position: relative;
+  padding-block: var(--section);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gap);
+}
+
+.measure {
+  max-width: 34em;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.lead {
+  font-size: var(--step-1);
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+.display-1 {
+  font-size: var(--step-6);
+  line-height: 1.02;
+}
+.display-2 {
+  font-size: var(--step-5);
+}
+.display-3 {
+  font-size: var(--step-4);
+}
+.heading-2 {
+  font-size: var(--step-3);
+}
+
+/* --------------------------------------------------------------------------
+   Keys (buttons). A primary key glows warm on hover, like a dimmer coming up.
+   -------------------------------------------------------------------------- */
+.key {
+  --key-bg: var(--glass);
+  --key-fg: var(--plaster);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 3.25rem;
+  padding: 0.85rem 1.75rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-key);
+  background: var(--key-bg);
+  color: var(--key-fg);
+  font-size: var(--step-0);
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    box-shadow 0.5s var(--ease-out),
+    background-color 0.5s var(--ease-out),
+    color 0.3s var(--ease-out),
+    transform 0.5s var(--ease-out);
+}
+.surface-dark .key {
+  --key-bg: var(--plaster);
+  --key-fg: var(--glass);
+}
+.key:hover {
+  box-shadow:
+    0 0 0 1px var(--lumen),
+    0 0 2.2rem var(--lumen-glow);
+}
+.surface-dark .key:hover {
+  background: #fff6ec;
+}
+.key:active {
+  transform: scale(0.98);
+}
+.key svg {
+  width: 1.15em;
+  height: 1.15em;
+  flex: none;
+}
+
+.key--ghost {
+  --key-bg: transparent;
+  --key-fg: currentColor;
+  border-color: var(--line);
+}
+.surface-dark .key--ghost {
+  --key-bg: transparent;
+  --key-fg: var(--plaster);
+}
+.key--ghost:hover {
+  border-color: var(--lumen);
+}
+
+/* A text link with a light line underneath that warms up on hover */
+.link-line {
+  position: relative;
+  display: inline-block;
+  padding-block: 0.25rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+.link-line::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.45;
+  transform-origin: right;
+  transition:
+    opacity 0.4s var(--ease-out),
+    background-color 0.4s var(--ease-out),
+    box-shadow 0.4s var(--ease-out);
+}
+.link-line:hover::after {
+  opacity: 1;
+  background: var(--lumen);
+  box-shadow: 0 0 10px var(--lumen-glow);
+}
+
+/* --------------------------------------------------------------------------
+   Utilities
+   -------------------------------------------------------------------------- */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.skip-link {
+  position: fixed;
+  inset-inline-start: 1rem;
+  top: 1rem;
+  z-index: 100;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-key);
+  background: var(--glass);
+  color: var(--plaster);
+  text-decoration: none;
+  transform: translateY(-200%);
+  transition: transform 0.3s var(--ease-out);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* --------------------------------------------------------------------------
+   Motion states. Content is always in the HTML and visible without JS;
+   the hidden starting states apply only once motion.ts has confirmed it runs.
+   -------------------------------------------------------------------------- */
+html.motion-ready [data-reveal='lines'] .line-inner {
+  display: inline-block;
+}
+html.motion-ready [data-reveal='media'] {
+  clip-path: inset(0 0 0 100%);
+}
+html.motion-ready [data-reveal='fade'] {
+  opacity: 0;
+  translate: 0 1.25rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Page transitions (cross-document View Transitions; ignored where unsupported)
+   -------------------------------------------------------------------------- */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root) {
+  animation: 0.32s var(--ease-dimmer) both vt-out;
+}
+::view-transition-new(root) {
+  animation: 0.48s var(--ease-out) both vt-in;
+}
+@keyframes vt-out {
+  to {
+    opacity: 0;
+    filter: brightness(0.6);
+  }
+}
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    filter: brightness(1.15);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

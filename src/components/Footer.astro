@@ -1,0 +1,182 @@
+---
+import { SITE, SOLUTIONS, PROFESSIONALS, LEGAL_NAV, whatsappLink } from '../data/site';
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer surface-dark">
+  <div class="footer-light" aria-hidden="true"></div>
+  <div class="wrap footer-grid">
+    <div class="footer-brand">
+      <Logo />
+      <p class="footer-brand__text">
+        בית חכם אלחוטי, בלי חציבות. מתגים, תאורה, שמע, אבטחה ואקלים במערכת אחת, מתוכננת יחד עם האדריכל ומותקנת על ידי מתקינים מוסמכים.
+      </p>
+      <ul class="footer-contact">
+        <li>
+          <a href={whatsappLink('היי, הגעתי מהאתר של לומרה')} target="_blank" rel="noopener" data-track="whatsapp-footer">
+            <Icon name="chat" />
+            וואטסאפ
+          </a>
+        </li>
+        <li>
+          <a href={SITE.phoneHref} data-track="phone-footer">
+            <Icon name="phone" />
+            <span class="ltr" dir="ltr">{SITE.phoneDisplay}</span>
+          </a>
+        </li>
+        <li>
+          <span><Icon name="pin" />{SITE.address.neighborhood}, {SITE.address.locality}</span>
+        </li>
+      </ul>
+    </div>
+
+    <nav class="footer-nav" aria-labelledby="footer-solutions">
+      <h2 id="footer-solutions" class="footer-nav__title">פתרונות</h2>
+      <ul>
+        {SOLUTIONS.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+      </ul>
+    </nav>
+
+    <nav class="footer-nav" aria-labelledby="footer-pros">
+      <h2 id="footer-pros" class="footer-nav__title">לאנשי מקצוע</h2>
+      <ul>
+        {PROFESSIONALS.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+        <li><a href={SITE.toolUrl}>מנתח תוכניות החשמל</a></li>
+      </ul>
+    </nav>
+
+    <nav class="footer-nav" aria-labelledby="footer-info">
+      <h2 id="footer-info" class="footer-nav__title">לומרה</h2>
+      <ul>
+        <li><a href="/about/">אודות</a></li>
+        <li><a href="/contact/">צור קשר</a></li>
+        <li><a href={SITE.appUrl} rel="noopener">האפליקציה שלנו</a></li>
+        {LEGAL_NAV.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+      </ul>
+    </nav>
+  </div>
+
+  <div class="wrap footer-base">
+    <p>© {year} {SITE.legalName}</p>
+    <ul class="footer-social">
+      {SITE.social.facebook && <li><a href={SITE.social.facebook} rel="noopener" target="_blank">פייסבוק</a></li>}
+      {SITE.social.instagram && <li><a href={SITE.social.instagram} rel="noopener" target="_blank">אינסטגרם</a></li>}
+      {SITE.social.youtube && <li><a href={SITE.social.youtube} rel="noopener" target="_blank">יוטיוב</a></li>}
+      {SITE.social.linkedin && <li><a href={SITE.social.linkedin} rel="noopener" target="_blank">לינקדאין</a></li>}
+    </ul>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    position: relative;
+    padding-block: clamp(4rem, 8vw, 7rem) 2rem;
+  }
+  /* The light line: a recessed magnetic track glowing along the top edge */
+  .footer-light {
+    position: absolute;
+    top: 0;
+    inset-inline: var(--gutter);
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(to left, transparent, var(--lumen) 18%, var(--lumen-hot) 50%, var(--lumen) 82%, transparent);
+    box-shadow:
+      0 0 18px var(--lumen-glow),
+      0 0 60px rgb(255 179 107 / 0.18);
+    opacity: 0.85;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr));
+    gap: clamp(2rem, 4vw, 4rem);
+  }
+  .footer-brand__text {
+    max-width: 30em;
+    margin-top: 1.5rem;
+    color: var(--stone-on-dark);
+    font-weight: 300;
+  }
+  .footer-contact {
+    display: grid;
+    gap: 0.6rem;
+    margin: 1.75rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .footer-contact a,
+  .footer-contact span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+  }
+  .footer-contact :global(svg) {
+    width: 1.15rem;
+    height: 1.15rem;
+    color: var(--lumen);
+  }
+  .footer-nav__title {
+    margin-bottom: 1rem;
+    font-family: var(--font-text);
+    font-size: var(--step-0);
+    font-weight: 500;
+  }
+  .footer-nav ul {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .footer-nav a {
+    color: var(--stone-on-dark);
+    text-decoration: none;
+    transition: color 0.3s var(--ease-out);
+  }
+  .footer-nav a:hover {
+    color: var(--plaster);
+  }
+  .footer-base {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: clamp(3rem, 6vw, 5rem);
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line-on-dark);
+    color: var(--stone-on-dark);
+    font-size: var(--step--1);
+  }
+  .footer-social {
+    display: flex;
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .footer-social a {
+    text-decoration: none;
+  }
+  .footer-social a:hover {
+    color: var(--plaster);
+  }
+  @media (max-width: 64rem) {
+    .footer-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .footer-brand {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (max-width: 36rem) {
+    .footer-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .site-footer {
+      padding-bottom: 6rem;
+    }
+  }
+</style>

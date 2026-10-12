@@ -1,0 +1,179 @@
+---
+// Closing call to action: WhatsApp first (the channel leads actually use),
+// phone second, and a short form that composes the WhatsApp message.
+import { SITE, whatsappLink } from '../data/site';
+import Icon from './Icon.astro';
+
+interface Props {
+  title?: string;
+  text?: string;
+  whatsappMessage?: string;
+  id?: string;
+}
+const {
+  title = 'בואו נתכנן את הבית שלכם',
+  text = 'שלחו לנו כמה מילים על הפרויקט, או את תוכנית החשמל, ונחזור אליכם עם כיוון ראשוני והמלצה מה לשלוט ומאיפה.',
+  whatsappMessage = 'היי, אשמח לייעוץ לבית חכם',
+  id = 'contact-cta',
+} = Astro.props;
+---
+
+<section class="cta section surface-dark" aria-labelledby={`${id}-title`} id={id}>
+  <div class="cta__glow" aria-hidden="true"></div>
+  <div class="wrap cta__grid">
+    <div class="cta__copy">
+      <h2 id={`${id}-title`} class="display-2" data-reveal="lines">{title}</h2>
+      <p class="lead cta__lead">{text}</p>
+      <div class="cta__actions">
+        <a class="key" href={whatsappLink(whatsappMessage)} target="_blank" rel="noopener" data-track="whatsapp-cta">
+          <Icon name="chat" />
+          כתבו לנו בוואטסאפ
+        </a>
+        <a class="key key--ghost" href={SITE.phoneHref} data-track="phone-cta">
+          <Icon name="phone" />
+          <span class="ltr" dir="ltr">{SITE.phoneDisplay}</span>
+        </a>
+      </div>
+    </div>
+
+    <form class="cta__form" data-wa-form data-wa-number={SITE.whatsappNumber} novalidate={false}>
+      <p class="cta__form-title">או מלאו פרטים, וההודעה תיפתח בוואטסאפ</p>
+      <div class="field">
+        <label for={`${id}-name`}>שם</label>
+        <input id={`${id}-name`} name="name" type="text" autocomplete="name" required />
+      </div>
+      <div class="field">
+        <label for={`${id}-project`}>סוג הפרויקט</label>
+        <select id={`${id}-project`} name="project">
+          <option value="בית פרטי בבנייה">בית פרטי בבנייה</option>
+          <option value="שיפוץ">שיפוץ</option>
+          <option value="דירה">דירה</option>
+          <option value="פרויקט של יזם או קבלן">פרויקט של יזם או קבלן</option>
+          <option value="אדריכל או מעצב">אני אדריכל או מעצב</option>
+          <option value="חשמלאי או מתקין">אני חשמלאי או מתקין</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for={`${id}-city`}>יישוב</label>
+        <input id={`${id}-city`} name="city" type="text" autocomplete="address-level2" />
+      </div>
+      <div class="field field--wide">
+        <label for={`${id}-message`}>מה חשוב לכם? <span class="muted">(לא חובה)</span></label>
+        <textarea id={`${id}-message`} name="message" rows="3"></textarea>
+      </div>
+      <button class="key" type="submit">
+        <Icon name="chat" />
+        פתיחת ההודעה בוואטסאפ
+      </button>
+      <p class="cta__privacy muted">
+        הפרטים לא נשמרים באתר. הם נכנסים להודעה בוואטסאפ, ואתם מחליטים אם לשלוח. <a href="/privacy/">מדיניות פרטיות</a>
+      </p>
+      <p class="cta__done" data-wa-done hidden role="status">ההודעה נפתחה בוואטסאפ. נשאר רק ללחוץ על שליחה.</p>
+    </form>
+  </div>
+</section>
+
+<style>
+  .cta {
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .cta__glow {
+    position: absolute;
+    inset-inline-start: -10%;
+    top: -40%;
+    z-index: -1;
+    width: 70%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(255 179 107 / 0.22), rgb(255 179 107 / 0));
+    filter: blur(10px);
+  }
+  .cta__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: clamp(2.5rem, 6vw, 6rem);
+    align-items: start;
+  }
+  .cta__lead {
+    margin-top: 1.5rem;
+    max-width: 30em;
+    color: rgb(230 230 225 / 0.82);
+  }
+  .cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2.25rem;
+  }
+  .cta__form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    border: 1px solid var(--line-on-dark);
+    border-radius: var(--radius-panel);
+    background: rgb(34 40 42 / 0.6);
+  }
+  .cta__form-title {
+    grid-column: 1 / -1;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+  }
+  .field {
+    display: grid;
+    gap: 0.4rem;
+  }
+  .field--wide {
+    grid-column: 1 / -1;
+  }
+  .field label {
+    color: var(--stone-on-dark);
+    font-size: 0.92rem;
+  }
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--line-on-dark);
+    border-radius: var(--radius-field);
+    background: var(--glass);
+    color: var(--plaster);
+  }
+  .field textarea {
+    resize: vertical;
+  }
+  .field input:focus-visible,
+  .field select:focus-visible,
+  .field textarea:focus-visible {
+    border-color: var(--lumen);
+    outline-offset: 1px;
+  }
+  .cta__form .key {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+  .cta__privacy,
+  .cta__done {
+    grid-column: 1 / -1;
+    font-size: 0.88rem;
+  }
+  .cta__done {
+    color: var(--lumen);
+  }
+  @media (max-width: 64rem) {
+    .cta__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 36rem) {
+    .cta__form {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .cta__form .key {
+      justify-self: stretch;
+    }
+  }
+</style>

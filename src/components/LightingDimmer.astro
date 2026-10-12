@@ -1,0 +1,200 @@
+---
+// A working dimmer: brightness and colour temperature applied to a room photo.
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  room: ImageMetadata;
+  roomAlt: string;
+  headingLevel?: 'h2' | 'h3';
+  showCopy?: boolean;
+  showLink?: boolean;
+}
+const { room, roomAlt, headingLevel: H = 'h2', showCopy = true, showLink = true } = Astro.props;
+---
+
+<section class="lighting surface-dark section" aria-labelledby="lighting-title">
+  <div class="wrap lighting__grid">
+    {
+      showCopy && (
+        <div class="lighting__copy">
+          <H id="lighting-title" class="display-3" data-reveal="lines">
+            אור שמתכוונן לרגע
+          </H>
+          <p class="lead lighting__lead">
+            פסי צבירה מגנטיים שקועים בגבס, ספוטים, נברשות ותאורה אדריכלית. כל גוף תאורה מתעמעם ומשנה גוון, מלבן קר לצהוב חם, מהמתג או מהטלפון.
+          </p>
+          <p class="lighting__hint muted">נסו בעצמכם: הזיזו את המחוונים.</p>
+          {showLink && (
+            <a class="link-line" href="/lighting/">
+              תאורה מגנטית וחכמה
+            </a>
+          )}
+        </div>
+      )
+    }
+
+    <figure class="dimmer" data-dimmer>
+      <div class="dimmer__room" data-reveal="media">
+        <Picture src={room} alt={roomAlt} formats={['avif', 'webp']} widths={[640, 960, 1280, 1600]} sizes="(max-width: 64rem) 92vw, 56vw" />
+        <div class="dimmer__warm" aria-hidden="true"></div>
+        <div class="dimmer__cool" aria-hidden="true"></div>
+        <div class="dimmer__dark" aria-hidden="true"></div>
+      </div>
+      <figcaption class="dimmer__controls">
+        <label class="dimmer__control">
+          <span class="dimmer__name">עוצמה</span>
+          <input type="range" min="8" max="100" step="1" value="72" data-dimmer-level />
+          <output data-dimmer-level-out>72%</output>
+        </label>
+        <label class="dimmer__control">
+          <span class="dimmer__name">גוון</span>
+          <input type="range" min="2700" max="6500" step="100" value="3000" data-dimmer-kelvin class="dimmer__kelvin" />
+          <output data-dimmer-kelvin-out class="ltr" dir="ltr">3000K</output>
+        </label>
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .lighting__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+    gap: clamp(2rem, 6vw, 6rem);
+    align-items: center;
+  }
+  .lighting__lead {
+    margin-top: 1.5rem;
+    max-width: 28em;
+  }
+  .lighting__hint {
+    margin: 1.75rem 0 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .dimmer {
+    --level: 0.72;
+    --warmth: 0.92;
+    margin: 0;
+  }
+  .dimmer__room {
+    position: relative;
+    aspect-ratio: 16 / 11;
+    border-radius: var(--radius-panel);
+    overflow: hidden;
+    background: #0b0d0e;
+  }
+  .dimmer__room :global(picture),
+  .dimmer__room :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .dimmer__room :global(img) {
+    filter: brightness(calc(0.38 + var(--level) * 0.72)) saturate(calc(0.75 + var(--level) * 0.35));
+    transition: filter 0.25s linear;
+  }
+  .dimmer__warm,
+  .dimmer__cool,
+  .dimmer__dark {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    transition: opacity 0.25s linear;
+  }
+  .dimmer__warm {
+    background: radial-gradient(120% 90% at 50% 0%, #ffb36b, #b8641d);
+    mix-blend-mode: soft-light;
+    opacity: calc(var(--warmth) * 0.75);
+  }
+  .dimmer__cool {
+    background: radial-gradient(120% 90% at 50% 0%, #e8f2ff, #9fbfe6);
+    mix-blend-mode: soft-light;
+    opacity: calc((1 - var(--warmth)) * 0.7);
+  }
+  .dimmer__dark {
+    background: #050607;
+    opacity: calc((1 - var(--level)) * 0.5);
+  }
+
+  .dimmer__controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 2rem;
+    margin-top: 1.5rem;
+  }
+  .dimmer__control {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) 4.5rem;
+    align-items: center;
+    gap: 0.9rem;
+  }
+  .dimmer__name {
+    color: var(--stone-on-dark);
+    font-size: 0.95rem;
+  }
+  .dimmer__control output {
+    font-variant-numeric: tabular-nums;
+    text-align: end;
+  }
+
+  /* Range: a thin track that fills with light, a knob that glows */
+  .dimmer input[type='range'] {
+    --fill: 70%;
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    height: 2.75rem;
+    background: transparent;
+    cursor: pointer;
+  }
+  .dimmer input[type='range']::-webkit-slider-runnable-track {
+    height: 3px;
+    border-radius: 3px;
+    background: linear-gradient(to left, var(--lumen) var(--fill), rgb(230 230 225 / 0.22) var(--fill));
+  }
+  .dimmer input[type='range']::-moz-range-track {
+    height: 3px;
+    border-radius: 3px;
+    background: linear-gradient(to left, var(--lumen) var(--fill), rgb(230 230 225 / 0.22) var(--fill));
+  }
+  .dimmer input[type='range'].dimmer__kelvin::-webkit-slider-runnable-track {
+    background: linear-gradient(to left, #ffb36b, #fff1df 55%, #dce7f0);
+  }
+  .dimmer input[type='range'].dimmer__kelvin::-moz-range-track {
+    background: linear-gradient(to left, #ffb36b, #fff1df 55%, #dce7f0);
+  }
+  .dimmer input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 1.35rem;
+    height: 1.35rem;
+    margin-top: calc((3px - 1.35rem) / 2);
+    border: 0;
+    border-radius: 50%;
+    background: var(--plaster);
+    box-shadow: 0 0 0 4px rgb(255 179 107 / 0.25), 0 0 18px var(--lumen-glow);
+  }
+  .dimmer input[type='range']::-moz-range-thumb {
+    width: 1.35rem;
+    height: 1.35rem;
+    border: 0;
+    border-radius: 50%;
+    background: var(--plaster);
+    box-shadow: 0 0 0 4px rgb(255 179 107 / 0.25), 0 0 18px var(--lumen-glow);
+  }
+
+  @media (max-width: 64rem) {
+    .lighting__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 40rem) {
+    .dimmer__controls {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .dimmer__room {
+      aspect-ratio: 4 / 5;
+    }
+  }
+</style>

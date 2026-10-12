@@ -1,0 +1,44 @@
+---
+import type { Crumb } from './Seo.astro';
+interface Props {
+  items: Crumb[];
+}
+const { items } = Astro.props;
+const all = [{ name: 'דף הבית', path: '/' }, ...items];
+---
+
+<nav class="crumbs" aria-label="פירורי לחם">
+  <ol>
+    {
+      all.map((c, i) => (
+        <li>
+          {i < all.length - 1 ? <a href={c.path}>{c.name}</a> : <span aria-current="page">{c.name}</span>}
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<style>
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .crumbs li:not(:last-child)::after {
+    content: '/';
+    margin-inline-start: 0.4rem;
+    opacity: 0.6;
+  }
+  .crumbs a {
+    text-decoration: none;
+  }
+  .crumbs a:hover {
+    text-decoration: underline;
+  }
+</style>

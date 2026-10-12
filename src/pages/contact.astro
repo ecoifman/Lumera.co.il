@@ -1,0 +1,96 @@
+---
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import ContactCta from '../components/ContactCta.astro';
+import Icon from '../components/Icon.astro';
+import { SITE, whatsappLink } from '../data/site';
+
+const crumbs = [{ name: 'צור קשר', path: '/contact/' }];
+const contactPage = {
+  '@type': 'ContactPage',
+  '@id': `${SITE.url}/contact/#contact`,
+  url: `${SITE.url}/contact/`,
+  name: 'צור קשר עם לומרה',
+  about: { '@id': `${SITE.url}/#business` },
+};
+---
+
+<Base
+  title="צור קשר – ייעוץ לבית חכם | לומרה, חיפה"
+  description="דברו עם לומרה על בית חכם אלחוטי בלי חציבות: וואטסאפ, טלפון 054-236-3473, או שלחו תוכנית חשמל לבדיקה. המשרד בדניה, חיפה."
+  path="/contact/"
+  breadcrumbs={crumbs}
+  schema={[contactPage]}
+  whatsappMessage="היי, הגעתי מעמוד צור קשר באתר של לומרה"
+>
+  <section class="contact-hero section surface-light" aria-labelledby="contact-title">
+    <div class="wrap">
+      <Breadcrumbs items={crumbs} />
+      <h1 id="contact-title" class="display-2 contact-title" data-reveal="lines">בואו נדבר על הבית שלכם</h1>
+      <ul class="contact-ways">
+        <li>
+          <h2>וואטסאפ</h2>
+          <p>הדרך הכי מהירה. אפשר לצרף תוכנית חשמל או תמונות.</p>
+          <a class="key" href={whatsappLink('היי, הגעתי מעמוד צור קשר באתר של לומרה')} target="_blank" rel="noopener" data-track="whatsapp-contact">
+            <Icon name="chat" />
+            כתבו לנו
+          </a>
+        </li>
+        <li>
+          <h2>טלפון</h2>
+          <p>לשיחת ייעוץ ראשונה.</p>
+          <a class="key key--ghost" href={SITE.phoneHref} data-track="phone-contact">
+            <Icon name="phone" />
+            <span class="ltr" dir="ltr">{SITE.phoneDisplay}</span>
+          </a>
+        </li>
+        <li>
+          <h2>המשרד</h2>
+          <p>{SITE.address.neighborhood}, {SITE.address.locality}. פגישות בתיאום מראש.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+  <ContactCta title="או השאירו פרטים" whatsappMessage="היי, הגעתי מעמוד צור קשר באתר של לומרה" id="contact-form" />
+</Base>
+
+<style>
+  .contact-hero {
+    padding-top: calc(var(--header-h) + var(--section) * 0.6);
+  }
+  .contact-title {
+    margin-top: 1.5rem;
+  }
+  .contact-ways {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--gap);
+    margin: clamp(2.5rem, 6vw, 4rem) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .contact-ways li {
+    display: grid;
+    align-content: start;
+    gap: 0.75rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line-on-light);
+  }
+  .contact-ways h2 {
+    font-family: var(--font-text);
+    font-size: var(--step-1);
+    font-weight: 500;
+  }
+  .contact-ways p {
+    color: var(--stone-on-light);
+  }
+  .contact-ways .key {
+    justify-self: start;
+    margin-top: 0.5rem;
+  }
+  @media (max-width: 52rem) {
+    .contact-ways {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

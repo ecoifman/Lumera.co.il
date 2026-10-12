@@ -1,0 +1,116 @@
+---
+import '../styles/global.css';
+import Seo, { type Crumb } from '../components/Seo.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import MobileBar from '../components/MobileBar.astro';
+
+interface Preload {
+  href: string;
+  as: 'image' | 'video' | 'font' | 'fetch';
+  type?: string;
+  media?: string;
+  fetchpriority?: 'high' | 'low' | 'auto';
+  imagesrcset?: string;
+  imagesizes?: string;
+}
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  image?: string;
+  imageAlt?: string;
+  noindex?: boolean;
+  overlayHeader?: boolean;
+  breadcrumbs?: Crumb[];
+  schema?: Record<string, unknown>[];
+  preload?: Preload[];
+  whatsappMessage?: string;
+}
+
+const {
+  title,
+  description,
+  path,
+  image,
+  imageAlt,
+  noindex,
+  overlayHeader = false,
+  breadcrumbs,
+  schema,
+  preload = [],
+  whatsappMessage,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="he" dir="rtl" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <script is:inline>
+      // Decide before first paint whether the motion layer will run, so hidden
+      // starting states never flash. Crawlers and reduced-motion users get the
+      // finished page. If the motion bundle fails, the fallback restores content.
+      (function () {
+        var d = document.documentElement;
+        d.classList.remove('no-js');
+        d.classList.add('js');
+        var bot = /bot|crawl|spider|slurp|facebookexternalhit/i.test(navigator.userAgent);
+        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!bot && !reduce) {
+          d.classList.add('motion-ready');
+          setTimeout(function () {
+            if (!window.__lumeraMotion) d.classList.remove('motion-ready');
+          }, 3500);
+        }
+      })();
+    </script>
+    <link rel="preload" href="/fonts/bellefair-hebrew-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/ibm-plex-sans-hebrew-hebrew-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/ibm-plex-sans-hebrew-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    {
+      preload.map((p) => (
+        <link
+          rel="preload"
+          href={p.href}
+          as={p.as}
+          type={p.type}
+          media={p.media}
+          fetchpriority={p.fetchpriority}
+          imagesrcset={p.imagesrcset}
+          imagesizes={p.imagesizes}
+        />
+      ))
+    }
+    <Seo
+      title={title}
+      description={description}
+      path={path}
+      image={image}
+      imageAlt={imageAlt}
+      noindex={noindex}
+      breadcrumbs={breadcrumbs}
+      schema={schema}
+    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#1b1f21" />
+    <meta name="format-detection" content="telephone=no" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">דילוג לתוכן הראשי</a>
+    <Header overlay={overlayHeader} whatsappMessage={whatsappMessage} />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+    <MobileBar whatsappMessage={whatsappMessage} />
+    <script>
+      import '../scripts/main';
+    </script>
+  </body>
+</html>

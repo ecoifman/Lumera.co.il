@@ -1,0 +1,81 @@
+---
+// Two ways in: homeowners and professionals.
+import { whatsappLink } from '../data/site';
+---
+
+<section class="fork section surface-light" aria-labelledby="fork-title">
+  <div class="wrap">
+    <h2 id="fork-title" class="display-3 fork__title" data-reveal="lines">מאיפה מתחילים</h2>
+    <div class="fork__grid">
+      <article class="fork__card fork__card--home" aria-labelledby="fork-home">
+        <h3 id="fork-home" class="fork__name">בונים או משפצים בית</h3>
+        <p>
+          נעבור יחד על תוכנית החשמל ונחליט מה נשלט, מאיפה ובאיזה עיצוב. אחרי זה מקבלים הצעה מסודרת לפי התוכנית, בלי הפתעות בשטח.
+        </p>
+        <a class="key" href={whatsappLink('היי, אנחנו בונים או משפצים בית ורוצים לשמוע על לומרה')} target="_blank" rel="noopener" data-track="whatsapp-fork">
+          תיאום ייעוץ
+        </a>
+      </article>
+      <article class="fork__card fork__card--pro surface-dark" aria-labelledby="fork-pro">
+        <h3 id="fork-pro" class="fork__name">אדריכלים, יזמים וחשמלאים</h3>
+        <p>
+          קטלוגים, מפרט טכני וכלי שקורא תוכנית חשמל ומציע מפרט לומרה. ההתקנה נעשית לפי שיטה מתועדת, עם רשת מתקינים מוסמכים.
+        </p>
+        <div class="fork__actions">
+          <a class="key" href="/professionals/">למסלול אנשי המקצוע</a>
+          <a class="link-line" href="/tool/">מנתח תוכניות החשמל</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<style>
+  .fork__title {
+    margin-bottom: clamp(2rem, 5vw, 3.5rem);
+  }
+  .fork__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--gap);
+  }
+  .fork__card {
+    display: grid;
+    align-content: start;
+    gap: 1.25rem;
+    padding: clamp(2rem, 4.5vw, 4rem);
+    border-radius: var(--radius-panel);
+  }
+  .fork__card--home {
+    border: 1px solid var(--line-on-light);
+  }
+  .fork__card p {
+    max-width: 30em;
+    color: var(--muted);
+  }
+  .fork__card .key {
+    justify-self: start;
+    margin-top: 0.75rem;
+  }
+  .fork__name {
+    font-family: var(--font-display);
+    font-size: var(--step-3);
+    font-weight: 400;
+    line-height: 1.1;
+  }
+  .fork__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.75rem;
+    margin-top: 0.75rem;
+  }
+  .fork__actions .key {
+    margin-top: 0;
+  }
+  @media (max-width: 52rem) {
+    .fork__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

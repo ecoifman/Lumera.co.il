@@ -1,0 +1,17 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# raw media from Dropbox (large originals are never committed)
+media-src/
+
+# logs and OS files
+npm-debug.log*
+.DS_Store
+Thumbs.db
+.env
+.env.*
+.shots/

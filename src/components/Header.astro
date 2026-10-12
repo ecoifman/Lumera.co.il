@@ -1,0 +1,324 @@
+---
+import { SOLUTIONS, PROFESSIONALS, SITE, whatsappLink } from '../data/site';
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+
+interface Props {
+  /** true when the page opens on a dark full-bleed hero: the header starts transparent */
+  overlay?: boolean;
+  whatsappMessage?: string;
+}
+const { overlay = false, whatsappMessage = 'היי, הגעתי מהאתר של לומרה ואשמח לייעוץ לבית חכם' } = Astro.props;
+const current = Astro.url.pathname;
+const isCurrent = (href: string) => (current === href ? 'page' : undefined);
+const inSolutions = SOLUTIONS.some((s) => s.href === current);
+---
+
+<header class:list={['site-header', { 'is-overlay': overlay }]} data-header>
+  <div class="site-header__inner wrap">
+    <Logo />
+
+    <nav class="primary-nav" aria-label="ניווט ראשי">
+      <ul class="primary-nav__list">
+        <li class="has-panel" data-panel-root>
+          <button
+            type="button"
+            class:list={['nav-link', { 'is-current': inSolutions }]}
+            aria-expanded="false"
+            aria-controls="solutions-panel"
+            data-panel-toggle
+          >
+            פתרונות
+          </button>
+          <div class="solutions-panel surface-dark" id="solutions-panel" data-panel hidden>
+            <ul class="solutions-panel__list">
+              {
+                SOLUTIONS.map((item) => (
+                  <li>
+                    <a href={item.href} aria-current={isCurrent(item.href)}>
+                      <span class="sp-title">{item.label}</span>
+                      <span class="sp-desc">{item.description}</span>
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </li>
+        <li><a class="nav-link" href="/professionals/" aria-current={isCurrent('/professionals/')}>לאנשי מקצוע</a></li>
+        <li><a class="nav-link" href="/about/" aria-current={isCurrent('/about/')}>אודות</a></li>
+        <li><a class="nav-link" href="/contact/" aria-current={isCurrent('/contact/')}>צור קשר</a></li>
+      </ul>
+    </nav>
+
+    <a class="key header-cta" href={whatsappLink(whatsappMessage)} target="_blank" rel="noopener" data-track="whatsapp-header">
+      <Icon name="chat" />
+      <span>ייעוץ בוואטסאפ</span>
+    </a>
+
+    <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+      <Icon name="menu" class="menu-toggle__open" />
+      <Icon name="close" class="menu-toggle__close" />
+      <span class="visually-hidden" data-menu-label>פתיחת התפריט</span>
+    </button>
+  </div>
+
+  <div class="mobile-menu surface-dark" id="mobile-menu" data-menu hidden>
+    <div class="mobile-menu__inner wrap">
+      <nav aria-label="תפריט ראשי בנייד">
+        <p class="mobile-menu__group">פתרונות לבית</p>
+        <ul class="mobile-menu__list">
+          {SOLUTIONS.map((item) => <li><a href={item.href} aria-current={isCurrent(item.href)}>{item.label}</a></li>)}
+        </ul>
+        <p class="mobile-menu__group">לאנשי מקצוע</p>
+        <ul class="mobile-menu__list mobile-menu__list--small">
+          <li><a href="/professionals/">כל המסלול המקצועי</a></li>
+          {PROFESSIONALS.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+        </ul>
+        <ul class="mobile-menu__list mobile-menu__list--small">
+          <li><a href="/about/">אודות</a></li>
+          <li><a href="/contact/">צור קשר</a></li>
+        </ul>
+      </nav>
+      <div class="mobile-menu__actions">
+        <a class="key" href={whatsappLink(whatsappMessage)} target="_blank" rel="noopener" data-track="whatsapp-menu">
+          <Icon name="chat" />
+          ייעוץ בוואטסאפ
+        </a>
+        <a class="key key--ghost" href={SITE.phoneHref} data-track="phone-menu">
+          <Icon name="phone" />
+          <span class="ltr" dir="ltr">{SITE.phoneDisplay}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    --header-fg: var(--glass);
+    position: fixed;
+    inset-inline: 0;
+    top: 0;
+    z-index: 50;
+    color: var(--header-fg);
+    view-transition-name: site-header;
+    transition:
+      transform 0.6s var(--ease-out),
+      color 0.4s var(--ease-out);
+  }
+  .site-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgb(230 230 225 / 0.84);
+    backdrop-filter: blur(16px) saturate(1.2);
+    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+    border-bottom: 1px solid var(--line-on-light);
+    transition: opacity 0.5s var(--ease-out);
+  }
+  .site-header.is-overlay {
+    --header-fg: var(--plaster);
+    --focus: var(--lumen);
+  }
+  .site-header.is-overlay::before {
+    opacity: 0;
+  }
+  .site-header.is-overlay.is-solid {
+    --header-fg: var(--glass);
+    --focus: var(--glass);
+  }
+  .site-header.is-overlay.is-solid::before {
+    opacity: 1;
+  }
+  .site-header.is-hidden {
+    transform: translateY(-100%);
+  }
+
+  .site-header__inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    height: var(--header-h);
+  }
+
+  .primary-nav {
+    margin-inline-start: auto;
+  }
+  .primary-nav__list {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.9rem;
+    border: 0;
+    background: none;
+    font-size: 0.98rem;
+    font-weight: 400;
+    text-decoration: none;
+    position: relative;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0.9rem;
+    bottom: 0.45rem;
+    height: 1px;
+    background: var(--lumen);
+    box-shadow: 0 0 8px var(--lumen-glow);
+    opacity: 0;
+    transition: opacity 0.35s var(--ease-out);
+  }
+  .nav-link:hover::after,
+  .nav-link[aria-current='page']::after,
+  .nav-link.is-current::after,
+  .nav-link[aria-expanded='true']::after {
+    opacity: 1;
+  }
+
+  .has-panel {
+    position: relative;
+  }
+  .solutions-panel {
+    position: absolute;
+    top: calc(100% + 0.6rem);
+    inset-inline-start: -1rem;
+    width: min(46rem, 80vw);
+    padding: 1.25rem;
+    border-radius: var(--radius-panel);
+    box-shadow: 0 30px 80px rgb(0 0 0 / 0.35);
+  }
+  .solutions-panel[hidden] {
+    display: none;
+  }
+  .solutions-panel__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .solutions-panel a {
+    display: grid;
+    gap: 0.15rem;
+    padding: 0.9rem 1rem;
+    border-radius: 14px;
+    text-decoration: none;
+    transition: background-color 0.3s var(--ease-out);
+  }
+  .solutions-panel a:hover,
+  .solutions-panel a[aria-current='page'] {
+    background: var(--glass-3);
+  }
+  .sp-title {
+    font-weight: 500;
+  }
+  .sp-desc {
+    color: var(--stone-on-dark);
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+
+  .header-cta {
+    min-height: 2.75rem;
+    padding: 0.55rem 1.2rem;
+    font-size: 0.95rem;
+  }
+  .site-header.is-overlay:not(.is-solid) .header-cta {
+    --key-bg: var(--plaster);
+    --key-fg: var(--glass);
+  }
+
+  .menu-toggle {
+    display: none;
+    width: 3rem;
+    height: 3rem;
+    margin-inline-start: auto;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    place-items: center;
+  }
+  .menu-toggle :global(svg) {
+    width: 1.6rem;
+    height: 1.6rem;
+  }
+  .menu-toggle :global(.menu-toggle__close),
+  .menu-toggle[aria-expanded='true'] :global(.menu-toggle__open) {
+    display: none;
+  }
+  .menu-toggle[aria-expanded='true'] :global(.menu-toggle__close) {
+    display: block;
+  }
+
+  .mobile-menu {
+    position: fixed;
+    inset: 0;
+    top: 0;
+    z-index: -1;
+    padding-top: calc(var(--header-h) + 1rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .mobile-menu[hidden] {
+    display: none;
+  }
+  .mobile-menu__inner {
+    display: grid;
+    gap: 2.5rem;
+    padding-bottom: 3rem;
+  }
+  .mobile-menu__group {
+    margin: 1.5rem 0 0.5rem;
+    color: var(--stone-on-dark);
+    font-size: 0.9rem;
+  }
+  .mobile-menu__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .mobile-menu__list a {
+    display: block;
+    padding: 0.45rem 0;
+    font-family: var(--font-display);
+    font-size: var(--step-3);
+    line-height: 1.15;
+    text-decoration: none;
+  }
+  .mobile-menu__list--small a {
+    font-family: var(--font-text);
+    font-size: var(--step-1);
+    font-weight: 300;
+  }
+  .mobile-menu__actions {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  @media (max-width: 64rem) {
+    .primary-nav,
+    .header-cta {
+      display: none;
+    }
+    .menu-toggle {
+      display: grid;
+    }
+    .site-header.menu-open {
+      --header-fg: var(--plaster);
+      --focus: var(--lumen);
+    }
+    .site-header.menu-open::before {
+      opacity: 0;
+    }
+  }
+</style>

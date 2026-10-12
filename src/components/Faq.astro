@@ -1,0 +1,97 @@
+---
+// Questions and answers. The same items feed the FAQPage structured data
+// (built in the page with faqSchema), so the visible text and the data match.
+export interface FaqItem {
+  q: string;
+  a: string;
+}
+interface Props {
+  items: FaqItem[];
+  title?: string;
+  id?: string;
+}
+const { items, title = 'שאלות נפוצות', id = 'faq' } = Astro.props;
+---
+
+<section class="faq section surface-light" aria-labelledby={`${id}-title`}>
+  <div class="wrap faq__grid">
+    <h2 id={`${id}-title`} class="display-3 faq__title" data-reveal="lines">{title}</h2>
+    <div class="faq__list" data-faq>
+      {
+        items.map((item, i) => (
+          <details class="faq__item" open={i === 0}>
+            <summary class="faq__q">
+              <span>{item.q}</span>
+              <span class="faq__icon" aria-hidden="true" />
+            </summary>
+            <div class="faq__a">
+              <p>{item.a}</p>
+            </div>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+    gap: clamp(2rem, 6vw, 6rem);
+    align-items: start;
+  }
+  .faq__list {
+    border-top: 1px solid var(--line-on-light);
+  }
+  .faq__item {
+    border-bottom: 1px solid var(--line-on-light);
+  }
+  .faq__q {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding-block: 1.35rem;
+    font-size: var(--step-1);
+    font-weight: 500;
+    line-height: 1.4;
+    cursor: pointer;
+    list-style: none;
+  }
+  .faq__q::-webkit-details-marker {
+    display: none;
+  }
+  .faq__icon {
+    position: relative;
+    flex: none;
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+  .faq__icon::before,
+  .faq__icon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    inset-inline: 0;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform 0.45s var(--ease-out);
+  }
+  .faq__icon::after {
+    transform: rotate(90deg);
+  }
+  .faq__item[open] .faq__icon::after {
+    transform: rotate(0deg);
+  }
+  .faq__a {
+    padding-bottom: 1.5rem;
+    max-width: 38em;
+    color: var(--stone-on-light);
+  }
+  @media (max-width: 64rem) {
+    .faq__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

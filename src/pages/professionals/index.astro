@@ -1,0 +1,117 @@
+---
+import DomainPage from '../../layouts/DomainPage.astro';
+import { MEDIA } from '../../data/media';
+import { PROFESSIONALS, SITE } from '../../data/site';
+
+const faq = [
+  {
+    q: 'באיזה שלב כדאי לשתף את לומרה בפרויקט?',
+    a: 'בשלב תוכנית החשמל. אז החיסכון בצנרת ובנקודות נכנס לתכנון, ומיקום המתגים והתאורה נקבע לפי העיצוב.',
+  },
+  {
+    q: 'מה מקבלים כאנשי מקצוע?',
+    a: 'קטלוגים, מפרט טכני לכל חדר, ליווי בתכנון, והתקנה על ידי מתקינים מוסמכים לפי שיטה מתועדת.',
+  },
+  {
+    q: 'מה עושה מנתח תוכניות החשמל?',
+    a: 'מעלים אליו תוכנית חשמל, והוא מציע מפרט לומרה ראשוני: אילו מתגים, תאורה ונקודות שליטה מתאימים לכל חדר.',
+  },
+];
+
+const tracks = [
+  { ...PROFESSIONALS[0], text: 'מתגים ותאורה במקום שמתאים לעיצוב, קטלוגים ומפרט לכל חדר.' },
+  { ...PROFESSIONALS[1], text: 'בית חכם כסטנדרט בפרויקט, תשתית פשוטה יותר ושינויי דיירים בלי חציבות.' },
+  { ...PROFESSIONALS[2], text: 'הכשרה, שיטת עבודה מתועדת וליווי טכני ברשת המתקינים של לומרה.' },
+];
+---
+
+<DomainPage
+  faq={faq}
+  title="בית חכם לאנשי מקצוע: אדריכלים, יזמים וחשמלאים | לומרה"
+  description="לומרה לאנשי מקצוע: מפרט בית חכם לכל חדר, קטלוגים, מנתח תוכניות חשמל ורשת מתקינים מוסמכים. לאדריכלים, מעצבי פנים, יזמים, קבלנים וחשמלאים."
+  path="/professionals/"
+  h1="מתכננים בית חכם? נתכנן אותו איתכם"
+  lead="לומרה עובדת עם אדריכלים, מעצבי פנים, יזמים וחשמלאים כבר משלב תוכנית החשמל. מקבלים מפרט ברור, קטלוגים ושיטת התקנה מתועדת."
+  crumbs={[{ name: 'לאנשי מקצוע', path: '/professionals/' }]}
+  image={MEDIA.pages.professionals}
+  service={{ name: 'תכנון בית חכם לאנשי מקצוע', serviceType: 'ייעוץ ומפרט בית חכם לאדריכלים, יזמים וחשמלאים' }}
+  whatsappMessage="היי, אני איש מקצוע ורוצה לשמוע על העבודה עם לומרה"
+  ctaTitle="בואו נעבור יחד על הפרויקט"
+  ctaText="שלחו תוכנית חשמל או ספרו על הפרויקט, ונחזור עם מפרט ראשוני והצעה לשיתוף פעולה."
+>
+  <section class="tracks section surface-light" aria-labelledby="tracks-title">
+    <div class="wrap">
+      <h2 id="tracks-title" class="display-3 tracks__title" data-reveal="lines">איך אנחנו עובדים איתכם</h2>
+      <ul class="tracks__list">
+        {
+          tracks.map((t) => (
+            <li>
+              <a class="tracks__card" href={t.href}>
+                <h3>{t.label}</h3>
+                <p>{t.text}</p>
+                <span class="link-line">למסלול</span>
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a class="tracks__card tracks__card--tool surface-dark" href={SITE.toolUrl}>
+            <h3>מנתח תוכניות החשמל</h3>
+            <p>מעלים תוכנית חשמל ומקבלים הצעה ראשונית למפרט לומרה לכל חדר.</p>
+            <span class="link-line">לכלי</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+</DomainPage>
+
+<style>
+  .tracks__title {
+    margin-bottom: clamp(2rem, 5vw, 3.5rem);
+  }
+  .tracks__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .tracks__card {
+    display: grid;
+    gap: 0.9rem;
+    height: 100%;
+    padding: clamp(1.75rem, 3.5vw, 3rem);
+    border: 1px solid var(--line-on-light);
+    border-radius: var(--radius-panel);
+    text-decoration: none;
+    transition:
+      border-color 0.4s var(--ease-out),
+      box-shadow 0.4s var(--ease-out);
+  }
+  .tracks__card:hover {
+    border-color: var(--lumen);
+    box-shadow: 0 0 0 1px var(--lumen), 0 0 2rem var(--lumen-glow);
+  }
+  .tracks__card h3 {
+    font-family: var(--font-display);
+    font-size: var(--step-3);
+    font-weight: 400;
+    line-height: 1.1;
+  }
+  .tracks__card p {
+    color: var(--muted, var(--stone-on-light));
+  }
+  .tracks__card .link-line {
+    justify-self: start;
+  }
+  .tracks__card--tool {
+    border-color: transparent;
+  }
+  @media (max-width: 52rem) {
+    .tracks__list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

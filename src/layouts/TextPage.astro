@@ -1,0 +1,67 @@
+---
+// Plain reading layout for legal and informational pages.
+import Base from './Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import type { Crumb } from '../components/Seo.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  h1: string;
+  crumbs: Crumb[];
+  updated: string;
+  noindex?: boolean;
+}
+const { title, description, path, h1, crumbs, updated, noindex } = Astro.props;
+---
+
+<Base title={title} description={description} path={path} breadcrumbs={crumbs} noindex={noindex}>
+  <article class="text-page section surface-light">
+    <div class="wrap">
+      <Breadcrumbs items={crumbs} />
+      <h1 class="display-3 text-page__title">{h1}</h1>
+      <p class="text-page__updated muted">עודכן לאחרונה: {updated}</p>
+      <div class="text-page__body">
+        <slot />
+      </div>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .text-page {
+    padding-top: calc(var(--header-h) + var(--section) * 0.5);
+  }
+  .text-page__title {
+    margin-top: 1.5rem;
+  }
+  .text-page__updated {
+    margin-top: 0.75rem;
+    font-size: 0.92rem;
+  }
+  .text-page__body {
+    max-width: 42em;
+    margin-top: clamp(2rem, 5vw, 3rem);
+  }
+  .text-page__body :global(h2) {
+    margin: 2.5rem 0 0.75rem;
+    font-family: var(--font-text);
+    font-size: var(--step-2);
+    font-weight: 500;
+    line-height: 1.3;
+  }
+  .text-page__body :global(p),
+  .text-page__body :global(li) {
+    color: #3c403e;
+  }
+  .text-page__body :global(p + p) {
+    margin-top: 0.9rem;
+  }
+  .text-page__body :global(ul) {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0.75rem 0 0;
+    padding-inline-start: 1.25rem;
+  }
+</style>

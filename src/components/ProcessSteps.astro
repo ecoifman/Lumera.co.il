@@ -1,0 +1,119 @@
+---
+// How a project runs. This content is a sequence, so the steps are numbered,
+// and a light line connects them as the reader moves down the page.
+export interface Step {
+  title: string;
+  text: string;
+}
+interface Props {
+  title?: string;
+  steps?: Step[];
+}
+const {
+  title = 'מהשיחה הראשונה ועד שהבית עובד',
+  steps = [
+    { title: 'שיחת היכרות', text: 'בוואטסאפ או בטלפון: מה הבית, באיזה שלב הוא נמצא ומה חשוב לכם.' },
+    { title: 'תכנון על התוכנית', text: 'עוברים על תוכנית החשמל, ומחליטים יחד על נקודות השליטה, התאורה והעיצוב.' },
+    { title: 'התקנה', text: 'מתקין מוסמך של לומרה מבצע את העבודה לפי שיטה מתועדת, בלי חציבות.' },
+    { title: 'מסירה והדרכה', text: 'מגדירים סצנות ותזמונים, ומלמדים את כל בני הבית להשתמש במתגים ובאפליקציה.' },
+  ],
+} = Astro.props;
+---
+
+<section class="process section surface-light" aria-labelledby="process-title">
+  <div class="wrap">
+    <h2 id="process-title" class="display-3 process__title" data-reveal="lines">{title}</h2>
+    <ol class="process__list" data-steps>
+      {
+        steps.map((step) => (
+          <li class="process__step" data-step>
+            <h3 class="process__name">{step.title}</h3>
+            <p class="process__text">{step.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .process__title {
+    margin-bottom: clamp(2.5rem, 6vw, 5rem);
+    max-width: 14em;
+  }
+  .process__list {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+  }
+  .process__list::before {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    top: 1.05rem;
+    height: 1px;
+    background: var(--line-on-light);
+  }
+  .process__step {
+    position: relative;
+    padding-top: 3.25rem;
+  }
+  .process__step::before {
+    counter-increment: step;
+    content: counter(step);
+    position: absolute;
+    top: 0;
+    inset-inline-start: 0;
+    display: grid;
+    place-items: center;
+    width: 2.1rem;
+    height: 2.1rem;
+    border: 1px solid var(--line-on-light);
+    border-radius: 50%;
+    background: var(--plaster);
+    font-size: 0.9rem;
+    transition:
+      background-color 0.6s var(--ease-out),
+      color 0.6s var(--ease-out),
+      box-shadow 0.6s var(--ease-out),
+      border-color 0.6s var(--ease-out);
+  }
+  .process__step:global(.is-lit)::before,
+  html:not(.motion-ready) .process__step::before {
+    background: var(--glass);
+    border-color: var(--glass);
+    color: var(--lumen);
+    box-shadow: 0 0 0 4px rgb(255 179 107 / 0.18);
+  }
+  .process__name {
+    font-size: var(--step-1);
+    font-weight: 500;
+  }
+  .process__text {
+    margin-top: 0.6rem;
+    color: var(--stone-on-light);
+  }
+  @media (max-width: 64rem) {
+    .process__list {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2rem;
+    }
+    .process__list::before {
+      inset-inline: auto;
+      inset-inline-start: 1.05rem;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      height: auto;
+    }
+    .process__step {
+      padding-top: 0;
+      padding-inline-start: 3.5rem;
+    }
+  }
+</style>

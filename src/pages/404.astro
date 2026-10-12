@@ -1,0 +1,39 @@
+---
+import Base from '../layouts/Base.astro';
+import { SOLUTIONS } from '../data/site';
+---
+
+<Base title="העמוד לא נמצא | לומרה" description="העמוד שחיפשתם לא קיים באתר לומרה." path="/404/" noindex>
+  <section class="nf section surface-dark" data-hero aria-labelledby="nf-title">
+    <div class="wrap">
+      <h1 id="nf-title" class="display-2">העמוד הזה לא קיים</h1>
+      <p class="lead nf__lead">ייתכן שהקישור ישן או שיש בו טעות. אפשר להמשיך מכאן:</p>
+      <ul class="nf__links">
+        <li><a class="link-line" href="/">דף הבית</a></li>
+        {SOLUTIONS.map((s) => <li><a class="link-line" href={s.href}>{s.label}</a></li>)}
+        <li><a class="link-line" href="/contact/">צור קשר</a></li>
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf {
+    min-height: 80vh;
+    display: grid;
+    align-items: center;
+    padding-top: calc(var(--header-h) + 3rem);
+  }
+  .nf__lead {
+    margin-top: 1.25rem;
+    color: rgb(230 230 225 / 0.82);
+  }
+  .nf__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.75rem;
+    margin: 2rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+</style>

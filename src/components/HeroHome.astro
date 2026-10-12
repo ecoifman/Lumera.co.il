@@ -1,0 +1,233 @@
+---
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Icon from './Icon.astro';
+import { whatsappLink } from '../data/site';
+
+interface VideoSources {
+  mp4: string;
+  webm?: string;
+  mp4Small?: string;
+  webmSmall?: string;
+}
+interface Props {
+  poster: ImageMetadata;
+  video?: VideoSources;
+}
+const { poster, video } = Astro.props;
+---
+
+<section class="hero surface-dark" data-hero aria-labelledby="hero-title">
+  <div class="hero__media" id="hero-video" data-bg-video aria-hidden="true">
+    <div class="hero__frame" data-hero-media>
+      <Picture
+        src={poster}
+        alt=""
+        formats={['avif', 'webp']}
+        widths={[640, 960, 1280, 1920, 2560]}
+        sizes="100vw"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+        class="hero__poster"
+      />
+      {
+        video && (
+          <video class="hero__video" muted loop playsinline preload="none" disablepictureinpicture tabindex="-1">
+            {video.webmSmall && <source data-src={video.webmSmall} type="video/webm" media="(max-width: 40rem)" />}
+            {video.mp4Small && <source data-src={video.mp4Small} type="video/mp4" media="(max-width: 40rem)" />}
+            {video.webm && <source data-src={video.webm} type="video/webm" />}
+            <source data-src={video.mp4} type="video/mp4" />
+          </video>
+        )
+      }
+    </div>
+    <div class="hero__shade"></div>
+    <div class="hero__dim" data-hero-dim></div>
+  </div>
+
+  <div class="hero__content wrap">
+    <h1 id="hero-title" class="hero__title" data-hero-title>בית חכם אלחוטי,<br />בלי חציבות</h1>
+    <p class="hero__lead" data-hero-after>
+      מתגים בעיצוב אישי, תאורה מגנטית, שמע נסתר, אבטחה ואקלים. מערכת אחת שנשלטת מהקיר ומהטלפון, בלי לפתוח את הקירות.
+    </p>
+    <div class="hero__actions" data-hero-after>
+      <a class="key" href={whatsappLink('היי, הגעתי מדף הבית של לומרה ואשמח לייעוץ לבית חכם')} target="_blank" rel="noopener" data-track="whatsapp-hero">
+        <Icon name="chat" />
+        ייעוץ בוואטסאפ
+      </a>
+      <a class="link-line" href="#how-it-works">איך זה עובד</a>
+    </div>
+  </div>
+
+  {
+    video && (
+      <button type="button" class="hero__toggle" data-video-toggle="hero-video" aria-pressed="false" data-state="paused">
+        <Icon name="pause" class="i-pause" />
+        <Icon name="play" class="i-play" />
+        <span class="visually-hidden" data-label>
+          הפעלת הסרטון
+        </span>
+      </button>
+    )
+  }
+
+  <div class="hero__cue" aria-hidden="true">
+    <span class="hero__cue-line" data-hero-cue></span>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100svh;
+    display: grid;
+    align-items: end;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .hero__media {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+  .hero__frame {
+    position: absolute;
+    inset: 0;
+    will-change: transform;
+  }
+  .hero__frame :global(picture),
+  .hero__frame :global(img),
+  .hero__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hero__video {
+    opacity: 0;
+    transition: opacity 1.2s var(--ease-out);
+  }
+  .hero__media:global(.is-playing) .hero__video {
+    opacity: 1;
+  }
+  .hero__shade {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to top, rgb(27 31 33 / 0.92) 0%, rgb(27 31 33 / 0.55) 34%, rgb(27 31 33 / 0) 62%),
+      linear-gradient(to left, rgb(27 31 33 / 0.5) 0%, rgb(27 31 33 / 0) 55%);
+  }
+  .hero__dim {
+    position: absolute;
+    inset: 0;
+    background: #0b0d0e;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .hero__content {
+    padding-block: calc(var(--header-h) + 3rem) clamp(4.5rem, 10vh, 7.5rem);
+  }
+  .hero__title {
+    max-width: 11em;
+    font-size: var(--step-6);
+    line-height: 1.02;
+  }
+  .hero__lead {
+    max-width: 31em;
+    margin-top: clamp(1.25rem, 2.5vw, 2rem);
+    color: rgb(230 230 225 / 0.86);
+    font-size: var(--step-1);
+    font-weight: 300;
+    line-height: 1.6;
+  }
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.25rem 2rem;
+    margin-top: clamp(1.75rem, 3vw, 2.5rem);
+  }
+
+  .hero__toggle {
+    --focus: var(--lumen);
+    position: absolute;
+    inset-inline-end: var(--gutter);
+    bottom: clamp(1.5rem, 4vh, 2.5rem);
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid rgb(230 230 225 / 0.35);
+    border-radius: 50%;
+    background: rgb(27 31 33 / 0.35);
+    color: var(--plaster);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: border-color 0.3s var(--ease-out);
+  }
+  .hero__toggle:hover {
+    border-color: var(--lumen);
+  }
+  .hero__toggle :global(svg) {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+  .hero__toggle :global(.i-play),
+  .hero__toggle[data-state='playing'] :global(.i-pause) {
+    display: block;
+  }
+  .hero__toggle :global(.i-pause),
+  .hero__toggle[data-state='playing'] :global(.i-play) {
+    display: none;
+  }
+
+  /* Scroll cue: a vertical line of light, like a recessed track */
+  .hero__cue {
+    position: absolute;
+    inset-inline-start: 50%;
+    bottom: 0;
+    width: 1px;
+    height: clamp(2.5rem, 7vh, 4.5rem);
+    overflow: hidden;
+  }
+  .hero__cue-line {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgb(255 179 107 / 0), var(--lumen));
+    box-shadow: 0 0 10px var(--lumen-glow);
+  }
+  .hero__cue-line::after {
+    content: '';
+    position: absolute;
+    inset-inline: -1px;
+    top: -40%;
+    height: 40%;
+    background: var(--lumen-hot);
+    filter: blur(1px);
+    animation: cue-travel 2.6s var(--ease-dimmer) infinite;
+  }
+  @keyframes cue-travel {
+    to {
+      top: 110%;
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .hero {
+      align-items: end;
+    }
+    .hero__title {
+      font-size: clamp(2.8rem, 12.5vw, 4.1rem);
+    }
+    .hero__actions .key {
+      width: 100%;
+    }
+    .hero__cue {
+      display: none;
+    }
+  }
+</style>

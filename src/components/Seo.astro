@@ -1,0 +1,130 @@
+---
+// Head metadata and JSON-LD for every page.
+// The business entity (#business) and website (#website) are emitted on every page
+// so each page can reference them by @id; page-specific nodes come in via `schema`.
+import { SITE } from '../data/site';
+
+export interface Crumb {
+  name: string;
+  path: string;
+}
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  image?: string;
+  imageAlt?: string;
+  noindex?: boolean;
+  type?: 'website' | 'article';
+  breadcrumbs?: Crumb[];
+  schema?: Record<string, unknown>[];
+}
+
+const {
+  title,
+  description,
+  path,
+  image = '/og/default.jpg',
+  imageAlt = 'לומרה – בית חכם אלחוטי, בלי חציבות',
+  noindex = false,
+  type = 'website',
+  breadcrumbs = [],
+  schema = [],
+} = Astro.props;
+
+const canonical = new URL(path, SITE.url).href;
+const imageUrl = new URL(image, SITE.url).href;
+const businessId = `${SITE.url}/#business`;
+const websiteId = `${SITE.url}/#website`;
+
+const business = {
+  '@type': 'HomeAndConstructionBusiness',
+  '@id': businessId,
+  name: SITE.name,
+  alternateName: [SITE.nameEn, 'Lumera Smart Home', 'לומרה בית חכם'],
+  legalName: SITE.legalName,
+  url: `${SITE.url}/`,
+  logo: { '@type': 'ImageObject', url: `${SITE.url}/brand/lumera-logo.png` },
+  image: imageUrl,
+  description: 'בית חכם אלחוטי בלי חציבות: מתגים חכמים בעיצוב אישי, תאורה מגנטית, שמע נסתר, אבטחה ואקלים – במערכת אחת.',
+  telephone: SITE.phoneE164,
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: SITE.address.locality,
+    postalCode: SITE.address.postalCode,
+    addressRegion: SITE.address.region,
+    addressCountry: SITE.address.country,
+  },
+  contactPoint: {
+    '@type': 'ContactPoint',
+    telephone: SITE.phoneE164,
+    contactType: 'customer service',
+    availableLanguage: ['he', 'en'],
+  },
+  sameAs: Object.values(SITE.social).filter(Boolean),
+};
+
+const website = {
+  '@type': 'WebSite',
+  '@id': websiteId,
+  url: `${SITE.url}/`,
+  name: SITE.name,
+  alternateName: SITE.nameEn,
+  inLanguage: 'he-IL',
+  publisher: { '@id': businessId },
+};
+
+const webpage = {
+  '@type': 'WebPage',
+  '@id': `${canonical}#webpage`,
+  url: canonical,
+  name: title,
+  description,
+  inLanguage: 'he-IL',
+  isPartOf: { '@id': websiteId },
+  about: { '@id': businessId },
+  primaryImageOfPage: { '@type': 'ImageObject', url: imageUrl },
+};
+
+const breadcrumbNode =
+  breadcrumbs.length > 0
+    ? {
+        '@type': 'BreadcrumbList',
+        '@id': `${canonical}#breadcrumbs`,
+        itemListElement: [{ name: 'דף הבית', path: '/' }, ...breadcrumbs].map((c, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          name: c.name,
+          item: new URL(c.path, SITE.url).href,
+        })),
+      }
+    : null;
+
+const graph = {
+  '@context': 'https://schema.org',
+  '@graph': [business, website, webpage, ...(breadcrumbNode ? [breadcrumbNode] : []), ...schema],
+};
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex, follow" />}
+
+<meta property="og:type" content={type} />
+<meta property="og:locale" content={SITE.locale} />
+<meta property="og:site_name" content={SITE.name} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={imageUrl} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={imageAlt} />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={imageUrl} />
+
+<script type="application/ld+json" set:html={JSON.stringify(graph)} />

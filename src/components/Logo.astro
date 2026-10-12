@@ -1,0 +1,47 @@
+---
+// Brand mark. Uses the supplied logo file when it exists in /public/brand,
+// otherwise a typographic wordmark so the layout never breaks.
+import fs from 'node:fs';
+import path from 'node:path';
+
+interface Props {
+  tone?: 'auto' | 'light' | 'dark';
+}
+const { tone = 'auto' } = Astro.props;
+
+const svgPath = path.join(process.cwd(), 'public', 'brand', 'lumera-logo.svg');
+const hasSvg = fs.existsSync(svgPath);
+const svgMarkup = hasSvg
+  ? fs
+      .readFileSync(svgPath, 'utf8')
+      .replace(/<\?xml[^>]*>/, '')
+      .replace(/<!--[\s\S]*?-->/g, '')
+  : '';
+---
+
+<a href="/" class:list={['logo', `logo--${tone}`]} aria-label="לומרה – לדף הבית">
+  {hasSvg ? <span class="logo__svg" set:html={svgMarkup} aria-hidden="true" /> : <span class="logo__word" aria-hidden="true">LUMERA</span>}
+</a>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    color: currentColor;
+    text-decoration: none;
+    line-height: 1;
+  }
+  .logo__word {
+    font-family: var(--font-display);
+    font-size: 1.55rem;
+    letter-spacing: 0.32em;
+    /* the trailing tracking would push the word off-centre in RTL */
+    margin-inline-start: -0.32em;
+    direction: ltr;
+  }
+  .logo__svg :global(svg) {
+    height: 1.6rem;
+    width: auto;
+    fill: currentColor;
+  }
+</style>
