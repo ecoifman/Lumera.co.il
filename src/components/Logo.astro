@@ -19,9 +19,18 @@ const svgMarkup = hasSvg
   : '';
 ---
 
-<a href="/" class:list={['logo', `logo--${tone}`]} aria-label="לומרה – לדף הבית">
-  {hasSvg ? <span class="logo__svg" set:html={svgMarkup} aria-hidden="true" /> : <span class="logo__word" aria-hidden="true">LUMERA</span>}
-</a>
+{
+  hasSvg ? (
+    <a href="/" class:list={['logo', `logo--${tone}`]} aria-label="לומרה – לדף הבית">
+      <span class="logo__svg" set:html={svgMarkup} aria-hidden="true" />
+    </a>
+  ) : (
+    <a href="/" class:list={['logo', `logo--${tone}`]}>
+      <span class="logo__word" lang="en">LUMERA</span>
+      <span class="visually-hidden"> – לומרה, לדף הבית</span>
+    </a>
+  )
+}
 
 <style>
   .logo {

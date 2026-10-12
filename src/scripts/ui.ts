@@ -27,11 +27,17 @@ function initHeader() {
     panel.hidden = !open;
   };
 
-  panelToggle?.addEventListener('click', () => setPanel(!panelOpen));
+  // With a mouse the panel opens on hover; a click right after that hover must not close it.
+  let hoverOpenedAt = 0;
+  panelToggle?.addEventListener('click', () => {
+    if (panelOpen && Date.now() - hoverOpenedAt < 700) return;
+    setPanel(!panelOpen);
+  });
 
   if (panelRoot && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     panelRoot.addEventListener('pointerenter', () => {
       window.clearTimeout(hoverTimer);
+      if (!panelOpen) hoverOpenedAt = Date.now();
       setPanel(true);
     });
     panelRoot.addEventListener('pointerleave', () => {

@@ -23,6 +23,7 @@
     "sharp": "0.35.5"
   },
   "devDependencies": {
+    "axe-core": "4.14.0",
     "playwright": "1.64.0"
   }
 }
