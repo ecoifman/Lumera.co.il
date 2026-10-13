@@ -20,9 +20,9 @@ interface Props {
 const { rows } = Astro.props;
 ---
 
-<section class="domains surface-light section" id="solutions" aria-labelledby="solutions-title">
+<section class="domains surface-light section" id="whole-home" aria-labelledby="domains-title">
   <div class="wrap domains__head">
-    <h2 id="solutions-title" class="display-3" data-reveal="lines">כל הבית, במערכת אחת</h2>
+    <h2 id="domains-title" class="display-3" data-reveal="lines">כל הבית, במערכת אחת</h2>
     <p class="lead measure muted">
       מעבר למתגים ולתאורה: שמע, אבטחה ואקלים נכנסים לאותה מערכת ולאותה אפליקציה, ומתוכננים יחד מהיום הראשון.
     </p>
@@ -43,9 +43,9 @@ const { rows } = Astro.props;
               )}
             </div>
             {row.video && (
-              <button type="button" class="domain__toggle" data-video-toggle={`domain-video-${row.id}`} aria-pressed="false" data-state="paused">
+              <button type="button" class="domain__toggle" data-video-toggle={`domain-video-${row.id}`} data-state="paused">
                 <span class="visually-hidden" data-label>
-                  הפעלת הסרטון
+                  הפעלת סרטון הרקע
                 </span>
               </button>
             )}

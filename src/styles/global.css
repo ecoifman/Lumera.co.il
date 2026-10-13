@@ -361,6 +361,19 @@ html.motion-ready [data-reveal='fade'] {
   opacity: 0;
   translate: 0 1.25rem;
 }
+/* The page's one entrance (motion/index.ts heroIntro) starts from these states */
+html.motion-ready [data-hero] [data-hero-title],
+html.motion-ready [data-hero] [data-hero-after] {
+  visibility: hidden;
+}
+html.motion-ready [data-hero] [data-hero-dim] {
+  opacity: 0.92;
+}
+
+/* A modal (the film) holds the page still underneath it */
+html[data-modal='open'] {
+  overflow: hidden;
+}
 
 @media (prefers-reduced-motion: reduce) {
   *,

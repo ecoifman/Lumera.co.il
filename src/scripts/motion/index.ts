@@ -21,7 +21,10 @@ async function initSmoothScroll() {
   gsap.ticker.add((t) => lenis.raf(t * 1000));
   gsap.ticker.lagSmoothing(0);
 
-  window.addEventListener('lumera:menu', (e) => ((e as CustomEvent<boolean>).detail ? lenis.stop() : lenis.start()));
+  // The mobile menu and the film dialog hold the page still while they are open.
+  const hold = (e: Event) => ((e as CustomEvent<boolean>).detail ? lenis.stop() : lenis.start());
+  window.addEventListener('lumera:menu', hold);
+  window.addEventListener('lumera:modal', hold);
 
   // In-page anchors glide to their target, below the fixed header.
   document.addEventListener('click', (e) => {
@@ -144,8 +147,10 @@ export async function initMotion() {
   // The fallback timer may have fired while fonts loaded: then stay static.
   if (!html.classList.contains('motion-ready')) return;
 
-  await initSmoothScroll();
+  // The hero starts hidden (global.css), so its intro runs before anything that
+  // waits on the network, such as the smooth-scroll module.
   heroIntro();
+  await initSmoothScroll();
   revealLines();
   revealMedia();
   parallax();

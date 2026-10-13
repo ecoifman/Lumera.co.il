@@ -2,6 +2,21 @@
 
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+/** Data saver or a 2G-class connection: no autoplay, smaller files. */
+function isLowData() {
+  const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+  return !!conn && (conn.saveData === true || /(^|-)2g$/.test(conn.effectiveType ?? ''));
+}
+
+function parseJSON<T>(value: string | undefined): T | null {
+  if (!value) return null;
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return null;
+  }
+}
+
 /* -------------------------------------------------------------------------- */
 /* Header: solutions panel, mobile menu, scroll states                         */
 /* -------------------------------------------------------------------------- */
@@ -119,48 +134,114 @@ function initHeader() {
 /* -------------------------------------------------------------------------- */
 /* Background videos: lazy sources, play only on screen, a real pause button   */
 /* (WCAG 2.2.2: moving content longer than 5 seconds must be pausable).        */
+/*                                                                              */
+/* A block may offer two cuts (data-sources-wide / data-sources-stacked, chosen */
+/* by the block's data-stacked-query) and a reframing track (data-reframe:      */
+/* [[seconds, object-position-x %], ...]) that keeps each shot's subject in     */
+/* view when a wide cut is cropped to a narrower screen.                        */
 /* -------------------------------------------------------------------------- */
+type SourceList = [src: string, type: string][];
+
 function initVideos() {
   const blocks = document.querySelectorAll<HTMLElement>('[data-bg-video]');
   if (!blocks.length) return;
 
-  const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
-  const lowData = !!conn && (conn.saveData === true || /(^|-)2g$/.test(conn.effectiveType ?? ''));
+  const html = document.documentElement;
+  const autoplay = !reduceMotion() && !isLowData();
+  const hasFrameCallback = 'requestVideoFrameCallback' in HTMLVideoElement.prototype;
 
   blocks.forEach((block) => {
     const video = block.querySelector<HTMLVideoElement>('video');
-    const toggle = document.querySelector<HTMLButtonElement>(`[data-video-toggle="${block.id}"]`);
     if (!video) return;
+    const toggle = document.querySelector<HTMLButtonElement>(`[data-video-toggle="${block.id}"]`);
+    const progress = block.querySelector<HTMLElement>('[data-video-progress]');
+    const wide = parseJSON<SourceList>(video.dataset.sourcesWide);
+    const stacked = parseJSON<SourceList>(video.dataset.sourcesStacked);
+    const track = parseJSON<[number, number][]>(video.dataset.reframe);
+    const stackedQuery = block.dataset.stackedQuery ? window.matchMedia(block.dataset.stackedQuery) : null;
 
     let userPaused = false;
-    let loaded = false;
+    let inView = false;
+    let loadedKey = '';
 
     const setButton = (playing: boolean) => {
       if (!toggle) return;
-      toggle.setAttribute('aria-pressed', String(!playing));
       toggle.dataset.state = playing ? 'playing' : 'paused';
       const label = toggle.querySelector('[data-label]');
-      if (label) label.textContent = playing ? 'עצירת הסרטון' : 'הפעלת הסרטון';
+      if (label) label.textContent = playing ? 'עצירת סרטון הרקע' : 'הפעלת סרטון הרקע';
     };
 
+    /** Point the video at the cut for the current layout. Returns true if it changed. */
     const load = () => {
-      if (loaded) return;
-      loaded = true;
+      const set = stackedQuery?.matches && stacked ? stacked : wide;
+      if (set) {
+        const key = set.map(([src]) => src).join('|');
+        if (key === loadedKey) return false;
+        loadedKey = key;
+        video.replaceChildren(
+          ...set.map(([src, type]) => {
+            const source = document.createElement('source');
+            source.src = src;
+            source.type = type;
+            return source;
+          }),
+        );
+        video.load();
+        return true;
+      }
+      if (loadedKey) return false;
+      loadedKey = 'inline';
       video.querySelectorAll<HTMLSourceElement>('source[data-src]').forEach((s) => {
         s.src = s.dataset.src!;
       });
       video.load();
+      return true;
     };
 
-    const play = () => {
-      load();
-      const p = video.play();
-      if (p) p.then(() => setButton(true)).catch(() => setButton(false));
-      block.classList.add('is-playing');
+    // Per-frame work: reframe at shot changes, advance the progress line.
+    let shot = -1;
+    const reframeAt = (t: number) => {
+      if (!track?.length || stackedQuery?.matches) return;
+      let i = 0;
+      while (i + 1 < track.length && track[i + 1][0] <= t + 0.02) i++;
+      if (i === shot) return;
+      shot = i;
+      video.style.setProperty('--x', `${track[i][1]}%`);
     };
-    const pause = () => {
-      video.pause();
+    let frameId = 0;
+    let running = false;
+    const onFrame = (_now?: number, meta?: { mediaTime: number }) => {
+      if (!running) return;
+      const t = meta?.mediaTime ?? video.currentTime;
+      reframeAt(t);
+      if (progress && video.duration) progress.style.transform = `scaleX(${Math.min(t / video.duration, 1)})`;
+      frameId = hasFrameCallback ? video.requestVideoFrameCallback(onFrame) : window.requestAnimationFrame(() => onFrame());
+    };
+    const startFrames = () => {
+      if (running || (!track && !progress)) return;
+      running = true;
+      onFrame();
+    };
+    const stopFrames = () => {
+      running = false;
+      if (hasFrameCallback) video.cancelVideoFrameCallback(frameId);
+      else window.cancelAnimationFrame(frameId);
+    };
+
+    video.addEventListener('playing', () => {
+      block.classList.add('is-playing');
+      setButton(true);
+      startFrames();
+    });
+    video.addEventListener('pause', () => {
       setButton(false);
+      stopFrames();
+    });
+
+    const play = () => {
+      if (html.dataset.modal === 'open') return;
+      load();
+      video.play()?.catch(() => setButton(false));
     };
 
     toggle?.addEventListener('click', () => {
@@ -169,19 +250,42 @@ function initVideos() {
         play();
       } else {
         userPaused = true;
-        pause();
+        video.pause();
       }
     });
 
-    if (reduceMotion() || lowData) {
+    // Turning a tablet or resizing across the breakpoint swaps the cut in place.
+    stackedQuery?.addEventListener('change', () => {
+      if (!loadedKey) return;
+      const wasPlaying = !video.paused;
+      const t = video.currentTime;
+      if (!load()) return;
+      shot = -1;
+      video.addEventListener('loadedmetadata', () => (video.currentTime = t % (video.duration || Infinity)), { once: true });
+      if (wasPlaying) play();
+    });
+
+    // The film dialog takes over: pause underneath it, resume afterwards.
+    let resumeAfterModal = false;
+    window.addEventListener('lumera:modal', (e) => {
+      if ((e as CustomEvent<boolean>).detail) {
+        resumeAfterModal = !video.paused;
+        if (resumeAfterModal) video.pause();
+      } else if (resumeAfterModal && inView && !userPaused) {
+        play();
+      }
+    });
+
+    if (!autoplay) {
       setButton(false);
       return;
     }
 
     const io = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !userPaused) play();
-        else if (!entry.isIntersecting && !video.paused) video.pause();
+        inView = entry.isIntersecting;
+        if (inView && !userPaused) play();
+        else if (!inView && !video.paused) video.pause();
       },
       { threshold: 0.15 },
     );
@@ -190,6 +294,59 @@ function initVideos() {
     const start = () => window.setTimeout(() => io.observe(block), 250);
     if (document.readyState === 'complete') start();
     else window.addEventListener('load', start, { once: true });
+  });
+}
+
+/* -------------------------------------------------------------------------- */
+/* The explainer film: a modal dialog with the full film and its sound.         */
+/* -------------------------------------------------------------------------- */
+function initFilm() {
+  const dialog = document.querySelector<HTMLDialogElement>('dialog[data-film]');
+  const openers = document.querySelectorAll<HTMLElement>('[data-film-open]');
+  if (!dialog || !openers.length) return;
+  const video = dialog.querySelector<HTMLVideoElement>('[data-film-video]');
+  const html = document.documentElement;
+  let opener: HTMLElement | null = null;
+
+  const chooseSource = () => {
+    if (!video || video.getAttribute('src')) return;
+    const large = window.matchMedia('(min-width: 64rem)').matches && !isLowData();
+    video.src = (large && video.dataset.srcLarge) || video.dataset.srcSmall || '';
+  };
+
+  const setModal = (open: boolean) => {
+    if (open) html.dataset.modal = 'open';
+    else delete html.dataset.modal;
+    window.dispatchEvent(new CustomEvent('lumera:modal', { detail: open }));
+  };
+
+  openers.forEach((btn) =>
+    btn.addEventListener('click', () => {
+      if (typeof dialog.showModal !== 'function') {
+        if (video?.dataset.srcSmall) window.location.href = video.dataset.srcSmall;
+        return;
+      }
+      opener = btn;
+      chooseSource();
+      setModal(true);
+      dialog.showModal();
+      video?.play()?.catch(() => {});
+    }),
+  );
+
+  dialog.querySelector('[data-film-close]')?.addEventListener('click', () => dialog.close());
+
+  // A click on the backdrop closes; a drag that starts on the player and ends outside does not.
+  let downOnBackdrop = false;
+  dialog.addEventListener('pointerdown', (e) => (downOnBackdrop = e.target === dialog));
+  dialog.addEventListener('click', (e) => {
+    if (downOnBackdrop && e.target === dialog) dialog.close();
+  });
+
+  dialog.addEventListener('close', () => {
+    video?.pause();
+    setModal(false);
+    opener?.focus({ preventScroll: true });
   });
 }
 
@@ -228,7 +385,7 @@ function initSwitchThemes() {
         screens.forEach((s) => s !== next && s.classList.remove('is-active'));
       }, 900);
       const live = demo.querySelector('[data-theme-live]');
-      if (live) live.textContent = `העיצוב שנבחר: ${btn.textContent?.trim() ?? ''}`;
+      if (live) live.textContent = `מוצג עכשיו: ${btn.textContent?.trim() ?? ''}`;
     };
 
     radios.forEach((btn, i) => {
@@ -341,6 +498,7 @@ function initFaq() {
 export function initUI() {
   initHeader();
   initVideos();
+  initFilm();
   initSwitchThemes();
   initDimmers();
   initWhatsAppForms();

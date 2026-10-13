@@ -1,6 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
-import HeroHome from '../components/HeroHome.astro';
+import HeroFilm from '../components/HeroFilm.astro';
+import SolutionIndex from '../components/SolutionIndex.astro';
+import FilmDialog from '../components/FilmDialog.astro';
 import InfraXray from '../components/InfraXray.astro';
 import SwitchShowcase, { type SwitchScreen } from '../components/SwitchShowcase.astro';
 import LightingDimmer from '../components/LightingDimmer.astro';
@@ -9,14 +11,17 @@ import TrackFork from '../components/TrackFork.astro';
 import ProcessSteps from '../components/ProcessSteps.astro';
 import Faq, { type FaqItem } from '../components/Faq.astro';
 import ContactCta from '../components/ContactCta.astro';
-import { faqSchema } from '../data/schema';
+import { faqSchema, videoSchema } from '../data/schema';
 import { MEDIA } from '../data/media';
+import { FILM, FILM_TRANSCRIPT_TEXT } from '../data/film';
+import { heroPosterPreloads } from '../data/hero-poster';
 
 const title = 'בית חכם אלחוטי בלי חציבות | מתגים, תאורה ושמע – לומרה';
 const description =
   'בית חכם אלחוטי, בלי חציבות ובלי תלות ב-Wi‑Fi: מתגי L10 עם מסך בעברית, תאורה מגנטית, שמע מולטירום, אבטחה ואקלים. לייעוץ: 054-236-3473.';
 
 const screens: SwitchScreen[] = MEDIA.switchScreens;
+const preload = await heroPosterPreloads();
 
 const rows: DomainRow[] = [
   {
@@ -78,11 +83,25 @@ const faq: FaqItem[] = [
   description={description}
   path="/"
   overlayHeader
-  schema={[faqSchema(faq, '/')]}
-  preload={MEDIA.heroPreload}
+  schema={[
+    faqSchema(faq, '/'),
+    videoSchema({
+      id: '/#film',
+      name: FILM.title,
+      description: FILM.description,
+      thumbnailUrl: FILM.poster,
+      contentUrl: FILM.sources.large,
+      uploadDate: FILM.uploadDate,
+      duration: FILM.isoDuration,
+      transcript: FILM_TRANSCRIPT_TEXT,
+    }),
+  ]}
+  preload={preload}
   whatsappMessage="היי, הגעתי מדף הבית של לומרה ואשמח לייעוץ לבית חכם"
 >
-  <HeroHome poster={MEDIA.heroPoster} video={MEDIA.heroVideo} />
+  <HeroFilm />
+
+  <SolutionIndex />
 
   <section class="intro section surface-light" aria-labelledby="intro-title">
     <div class="wrap intro__grid">
@@ -121,6 +140,8 @@ const faq: FaqItem[] = [
   <Faq items={faq} />
 
   <ContactCta whatsappMessage="היי, הגעתי מהאתר של לומרה ואשמח לתכנן בית חכם" />
+
+  <FilmDialog />
 </Base>
 
 <style>

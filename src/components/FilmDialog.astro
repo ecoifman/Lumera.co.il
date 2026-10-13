@@ -1,0 +1,207 @@
+---
+// The full explainer film, with sound, in a modal dialog. Opened by any
+// [data-film-open] button (see initFilm in ui.ts). The film carries burned-in
+// Hebrew captions; the transcript below it also lists the on-screen titles, so
+// the content is available without sound and without vision (WCAG 1.2.1-1.2.3).
+import Icon from './Icon.astro';
+import { FILM } from '../data/film';
+---
+
+<dialog class="film surface-dark" id="film-dialog" aria-labelledby="film-title" data-film data-lenis-prevent>
+  <div class="film__inner">
+    <header class="film__head">
+      <h2 id="film-title" class="film__title">{FILM.title}</h2>
+      <button type="button" class="film__close" data-film-close>
+        <Icon name="close" />
+        <span class="visually-hidden">סגירת הסרטון</span>
+      </button>
+    </header>
+
+    <div class="film__player">
+      <video
+        class="film__video"
+        controls
+        playsinline
+        preload="none"
+        poster={FILM.poster}
+        width="1920"
+        height="1080"
+        data-film-video
+        data-src-large={FILM.sources.large}
+        data-src-small={FILM.sources.small}
+      >
+        <a href={FILM.sources.small}>הורדת הסרטון</a>
+      </video>
+    </div>
+
+    <details class="film__transcript">
+      <summary>תמליל הסרטון</summary>
+      <ol>
+        {
+          FILM.transcript.map((line) =>
+            line.kind === 'screen' ? (
+              <li class="film__screen">
+                <span class="visually-hidden">כיתוב על המסך: </span>
+                {line.text}
+              </li>
+            ) : (
+              <li>{line.text}</li>
+            ),
+          )
+        }
+      </ol>
+    </details>
+  </div>
+</dialog>
+
+<style>
+  .film {
+    --film-w: min(92vw, 80rem, calc((92svh - 8rem) * 16 / 9));
+    width: var(--film-w);
+    max-width: none;
+    max-height: 94svh;
+    margin: auto;
+    padding: 0;
+    border: 1px solid var(--line-on-dark);
+    border-radius: var(--radius-panel);
+    background: #0f1213;
+    color: var(--plaster);
+    overflow: auto;
+    overscroll-behavior: contain;
+    box-shadow: 0 2.5rem 6rem rgb(0 0 0 / 0.55);
+  }
+  .film[open] {
+    animation: film-in 0.7s var(--ease-out) both;
+  }
+  .film::backdrop {
+    background: rgb(8 10 11 / 0.88);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  .film[open]::backdrop {
+    animation: film-fade 0.5s var(--ease-out) both;
+  }
+  @keyframes film-in {
+    from {
+      opacity: 0;
+      transform: translateY(1.25rem) scale(0.985);
+    }
+  }
+  @keyframes film-fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .film__inner {
+    display: grid;
+  }
+  .film__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 1.25rem 0.75rem 0.75rem;
+  }
+  .film__title {
+    font-family: var(--font-text);
+    font-size: var(--step-0);
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  .film__close {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid var(--line-on-dark);
+    border-radius: 50%;
+    background: transparent;
+    transition: border-color 0.3s var(--ease-out);
+  }
+  .film__close:hover {
+    border-color: var(--lumen);
+  }
+  .film__close :global(svg) {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+
+  .film__player {
+    aspect-ratio: 16 / 9;
+    background: #000;
+  }
+  .film__video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .film__transcript {
+    padding: 0.25rem 1.25rem 1rem;
+    border-top: 1px solid var(--line-on-dark);
+  }
+  .film__transcript summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 2.75rem;
+    color: var(--stone-on-dark);
+    font-size: 0.95rem;
+    cursor: pointer;
+    list-style: none;
+  }
+  .film__transcript summary::-webkit-details-marker {
+    display: none;
+  }
+  .film__transcript summary::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    border-inline-start: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    rotate: -45deg;
+    translate: 0 -0.15rem;
+    transition: rotate 0.3s var(--ease-out);
+  }
+  .film__transcript[open] summary::before {
+    rotate: 135deg;
+    translate: 0 0.15rem;
+  }
+  .film__transcript summary:hover {
+    color: var(--plaster);
+  }
+  .film__transcript ol {
+    display: grid;
+    gap: 0.6rem;
+    max-width: 46em;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
+    color: rgb(230 230 225 / 0.86);
+    font-size: 0.98rem;
+    line-height: 1.7;
+  }
+  .film__screen {
+    color: var(--stone-on-dark);
+    font-style: normal;
+    padding-inline-start: 0.9rem;
+    border-inline-start: 1px solid var(--line-on-dark);
+  }
+
+  @media (max-width: 40rem) {
+    .film {
+      --film-w: 100vw;
+      max-height: 100svh;
+      border-radius: 0;
+      border-inline: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .film[open],
+    .film[open]::backdrop {
+      animation: none;
+    }
+  }
+</style>

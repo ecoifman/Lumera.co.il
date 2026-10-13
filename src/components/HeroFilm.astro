@@ -1,0 +1,318 @@
+---
+// Home hero: Lumera's explainer film, edge to edge, with the headline over it.
+// The background is a muted, captionless cut of the film (the full film with sound
+// opens in FilmDialog). Wide screens get the 2.4:1 cut, reframed shot by shot so the
+// subject stays in view; portrait screens get a 4:5 cut and the text below it.
+import Icon from './Icon.astro';
+import { whatsappLink } from '../data/site';
+import { FILM } from '../data/film';
+import { heroPoster, STACKED_QUERY } from '../data/hero-poster';
+
+const poster = await heroPoster();
+const firstX = FILM.ambient.desktopTrack[0]?.[1] ?? 50;
+---
+
+<section class="hero surface-dark" data-hero aria-labelledby="hero-title">
+  <div class="hero__media" id="hero-video" data-bg-video data-stacked-query={STACKED_QUERY} aria-hidden="true">
+    <div class="hero__frame" data-hero-media>
+      <picture>
+        <source media={STACKED_QUERY} type="image/avif" srcset={poster.stackedAvif} sizes="100vw" />
+        <source media={STACKED_QUERY} type="image/webp" srcset={poster.stackedWebp} sizes="100vw" />
+        <source type="image/avif" srcset={poster.wideAvif} sizes="100vw" />
+        <source type="image/webp" srcset={poster.wideWebp} sizes="100vw" />
+        <img
+          class="hero__poster"
+          src={poster.fallback}
+          width={poster.width}
+          height={poster.height}
+          alt=""
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </picture>
+      <video
+        class="hero__video"
+        muted
+        loop
+        playsinline
+        preload="none"
+        disablepictureinpicture
+        disableremoteplayback
+        tabindex="-1"
+        data-sources-wide={JSON.stringify(FILM.ambient.wide)}
+        data-sources-stacked={JSON.stringify(FILM.ambient.stacked)}
+        data-reframe={JSON.stringify(FILM.ambient.desktopTrack)}
+        style={`--x: ${firstX}%`}
+      >
+      </video>
+    </div>
+    <div class="hero__shade"></div>
+    <div class="hero__dim" data-hero-dim></div>
+    <div class="hero__progress"><span data-video-progress></span></div>
+  </div>
+
+  <div class="hero__content wrap">
+    <p class="hero__eyebrow" data-hero-after><span lang="en" dir="ltr">LUMERA · Home Simplicity</span></p>
+    <h1 id="hero-title" class="hero__title" data-hero-title>בית חכם אלחוטי,<br />בלי חציבות</h1>
+    <p class="hero__lead" data-hero-after>
+      מתגים בעיצוב אישי, תאורה מגנטית, שמע נסתר, אבטחה ואקלים. מערכת אחת שנשלטת מהקיר ומהטלפון, בלי לפתוח את הקירות.
+    </p>
+    <div class="hero__actions" data-hero-after>
+      <a
+        class="key"
+        href={whatsappLink('היי, הגעתי מדף הבית של לומרה ואשמח לייעוץ לבית חכם')}
+        target="_blank"
+        rel="noopener"
+        data-track="whatsapp-hero"
+      >
+        <Icon name="chat" />
+        ייעוץ בוואטסאפ
+      </a>
+      <button type="button" class="film-cta" data-film-open aria-haspopup="dialog" aria-controls="film-dialog" data-track="film-hero">
+        <span class="film-cta__ring"><Icon name="play" /></span>
+        <span class="film-cta__label">צפו בסרטון</span>
+        <span class="film-cta__time" dir="ltr"><span class="visually-hidden">באורך </span>{FILM.durationLabel}</span>
+      </button>
+    </div>
+  </div>
+
+  <button type="button" class="hero__toggle" data-video-toggle="hero-video" data-state="paused">
+    <Icon name="pause" class="i-pause" />
+    <Icon name="play" class="i-play" />
+    <span class="visually-hidden" data-label>הפעלת סרטון הרקע</span>
+  </button>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100svh;
+    display: grid;
+    align-items: end;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .hero__media {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    background: #0b0d0e;
+  }
+  .hero__frame {
+    position: absolute;
+    inset: 0;
+    will-change: transform;
+  }
+  .hero__frame :global(picture),
+  .hero__poster,
+  .hero__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* the poster frame belongs to the second shot, framed at 55% */
+  .hero__poster {
+    object-position: 55% 50%;
+  }
+  .hero__video {
+    object-position: var(--x, 50%) 50%;
+    opacity: 0;
+    transition: opacity 1.2s var(--ease-out);
+  }
+  .hero__media:global(.is-playing) .hero__video {
+    opacity: 1;
+  }
+  .hero__shade {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to bottom, rgb(27 31 33 / 0.6) 0%, rgb(27 31 33 / 0) 24%),
+      linear-gradient(to top, rgb(27 31 33 / 0.94) 0%, rgb(27 31 33 / 0.58) 34%, rgb(27 31 33 / 0) 62%),
+      linear-gradient(to left, rgb(27 31 33 / 0.55) 0%, rgb(27 31 33 / 0) 52%);
+  }
+  .hero__dim {
+    position: absolute;
+    inset: 0;
+    background: #0b0d0e;
+    opacity: 0;
+    pointer-events: none;
+  }
+  /* playback runs along the bottom edge as a recessed line of light (RTL: fills from the right) */
+  .hero__progress {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 2px;
+    background: rgb(230 230 225 / 0.12);
+  }
+  .hero__progress span {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to left, var(--lumen-hot), var(--lumen));
+    box-shadow: 0 0 12px var(--lumen-glow);
+    transform: scaleX(0);
+    transform-origin: right center;
+  }
+
+  .hero__content {
+    padding-block: calc(var(--header-h) + 3rem) clamp(4.5rem, 11vh, 8rem);
+  }
+  .hero__eyebrow {
+    margin-bottom: 1.25rem;
+    color: rgb(230 230 225 / 0.72);
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+  }
+  .hero__title {
+    max-width: 11em;
+    font-size: var(--step-6);
+    line-height: 1.02;
+  }
+  .hero__lead {
+    max-width: 30em;
+    margin-top: clamp(1.25rem, 2.5vw, 1.75rem);
+    color: rgb(230 230 225 / 0.86);
+    font-size: var(--step-1);
+    font-weight: 300;
+    line-height: 1.6;
+  }
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.75rem;
+    margin-top: clamp(1.75rem, 3vw, 2.5rem);
+  }
+
+  .film-cta {
+    --focus: var(--lumen);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    min-height: 3.25rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--plaster);
+    font-size: var(--step-0);
+    font-weight: 500;
+  }
+  .film-cta__ring {
+    display: grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border: 1px solid rgb(230 230 225 / 0.45);
+    border-radius: 50%;
+    transition:
+      border-color 0.45s var(--ease-out),
+      box-shadow 0.45s var(--ease-out),
+      background-color 0.45s var(--ease-out);
+  }
+  .film-cta__ring :global(svg) {
+    width: 1.05rem;
+    height: 1.05rem;
+    translate: 1px 0;
+    fill: currentColor;
+  }
+  .film-cta:hover .film-cta__ring,
+  .film-cta:focus-visible .film-cta__ring {
+    border-color: var(--lumen);
+    background: rgb(255 179 107 / 0.1);
+    box-shadow:
+      0 0 0 1px var(--lumen),
+      0 0 2rem var(--lumen-glow);
+  }
+  .film-cta__time {
+    color: var(--stone-on-dark);
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hero__toggle {
+    --focus: var(--lumen);
+    position: absolute;
+    inset-inline-end: var(--gutter);
+    bottom: clamp(1.5rem, 4vh, 2.5rem);
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid rgb(230 230 225 / 0.35);
+    border-radius: 50%;
+    background: rgb(27 31 33 / 0.35);
+    color: var(--plaster);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: border-color 0.3s var(--ease-out);
+  }
+  .hero__toggle:hover {
+    border-color: var(--lumen);
+  }
+  .hero__toggle :global(svg) {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+  .hero__toggle :global(.i-play),
+  .hero__toggle[data-state='playing'] :global(.i-pause) {
+    display: block;
+  }
+  .hero__toggle :global(.i-pause),
+  .hero__toggle[data-state='playing'] :global(.i-play) {
+    display: none;
+  }
+
+  /* Portrait screens: the 4:5 cut on top, the text below it */
+  @media (max-aspect-ratio: 3/4) {
+    .hero {
+      display: block;
+      min-height: 0;
+    }
+    .hero__media {
+      position: relative;
+      inset: auto;
+      z-index: 0;
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      max-height: 66svh;
+    }
+    .hero__poster,
+    .hero__video {
+      object-position: 50% 50%;
+    }
+    .hero__shade {
+      background:
+        linear-gradient(to bottom, rgb(27 31 33 / 0.65) 0%, rgb(27 31 33 / 0) 26%),
+        linear-gradient(to top, var(--glass) 0%, rgb(27 31 33 / 0.78) 18%, rgb(27 31 33 / 0) 48%);
+    }
+    .hero__progress {
+      display: none;
+    }
+    .hero__content {
+      position: relative;
+      z-index: 1;
+      margin-top: -6rem;
+      padding-block: 0 2.75rem;
+    }
+    .hero__title {
+      font-size: clamp(2.6rem, 11.5vw, 4.4rem);
+    }
+    .hero__lead {
+      font-size: 1.06rem;
+    }
+    .hero__actions {
+      gap: 0.75rem 1.25rem;
+    }
+    .hero__toggle {
+      top: calc(var(--header-h) + 0.5rem);
+      bottom: auto;
+    }
+  }
+</style>

@@ -32,6 +32,8 @@ export function serviceSchema(opts: { name: string; description: string; path: s
 }
 
 export function videoSchema(opts: {
+  /** Path plus fragment for the node's @id, e.g. '/#film'. */
+  id?: string;
   name: string;
   description: string;
   thumbnailUrl: string;
@@ -39,16 +41,20 @@ export function videoSchema(opts: {
   embedUrl?: string;
   uploadDate: string;
   duration?: string;
+  transcript?: string;
 }) {
   return {
     '@type': 'VideoObject',
+    ...(opts.id ? { '@id': new URL(opts.id, SITE.url).href } : {}),
     name: opts.name,
     description: opts.description,
     thumbnailUrl: new URL(opts.thumbnailUrl, SITE.url).href,
     uploadDate: opts.uploadDate,
+    inLanguage: 'he',
     ...(opts.duration ? { duration: opts.duration } : {}),
     ...(opts.contentUrl ? { contentUrl: new URL(opts.contentUrl, SITE.url).href } : {}),
     ...(opts.embedUrl ? { embedUrl: opts.embedUrl } : {}),
+    ...(opts.transcript ? { transcript: opts.transcript } : {}),
     publisher: businessRef,
   };
 }

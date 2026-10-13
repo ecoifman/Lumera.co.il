@@ -15,8 +15,12 @@ Claude doc "לומרה בית חכם — אסטרטגיית האתר החדש". 
 - `npm run preview` – serve `dist/`
 - `node scripts/shots.mjs http://127.0.0.1:4321/ ./.shots` – desktop + mobile screenshots
   (`PAGES=/,/lighting/` to choose pages, `--motion` to capture with animations)
-- `bash scripts/process-media.sh <name> <video> [start] [duration] [posterSecond]` – encode a
-  background video (MP4 + WebM, 1080 and 720) and extract its poster
+- `npm run media:film` (`python3 scripts/build-film-media.py [stills] [ambient] [film]`) – rebuild
+  everything cut from the explainer film: the hero loop, the full film, posters and section stills
+- `bash scripts/process-media.sh <name> <video> [start] [duration] [posterSecond]` – encode any
+  other background video (MP4 + WebM, 1080 and 720) and extract its poster
+- `node scripts/smoke.mjs http://127.0.0.1:4321/` – interactive checks (hero film, film dialog,
+  menus, demos); `node scripts/audit.mjs http://127.0.0.1:4321/` – axe, headings, links, JSON-LD
 
 Node 22.12+ is required (Astro 7).
 
@@ -28,7 +32,12 @@ Node 22.12+ is required (Astro 7).
 - `src/layouts/TextPage.astro` – accessibility and privacy pages
 - `src/components/Seo.astro` – title, description, canonical, Open Graph, JSON-LD @graph
 - `src/data/site.ts` – business details, phone, WhatsApp, navigation. Single source of truth.
-- `src/data/media.ts` – which image or video each section uses
+- `src/data/media.ts` – which image each section uses (all are frames from the explainer film)
+- `src/data/film.ts` – the explainer film: title, files, transcript, hero loop (`film.json` is
+  written by the media script: loop length and the per-shot reframing track)
+- `src/components/HeroFilm.astro` – home hero: the film's muted loop edge to edge, text over it
+- `src/components/FilmDialog.astro` – the full film with sound and transcript, in a `<dialog>`
+- `src/components/SolutionIndex.astro` – the six solution areas under the hero (`/#solutions`)
 - `src/data/schema.ts` – FAQPage, Service, VideoObject builders
 - `src/scripts/ui.ts` – menus, header states, video pause buttons, switch demo, dimmer, WhatsApp form
 - `src/scripts/motion/` – GSAP + ScrollTrigger + SplitText + Lenis; loaded only when motion is allowed
@@ -79,8 +88,16 @@ Node 22.12+ is required (Astro 7).
 ## Media
 
 - Originals from Dropbox (`/Lumera/Website/Videos and Pictures`) go in `media-src/` (git-ignored).
+  The explainer film master is `media-src/explainer-master.mp4` (1920x1080, 25 fps, 70.9 s).
+- The master has Hebrew captions burned in at the bottom (rows ~835–895). Every asset cut from
+  it uses rows 0–800 only, so the site's own text never collides with the captions. The shot
+  list, framing and still times live in `scripts/film_plan.py`.
+- Hero loop: `hero-d` (1920x800, 2.4:1) for wide screens, reframed per shot by `--x`
+  (object-position) from the track in `film.json`; `hero-m` (720x900, 4:5) for portrait screens
+  (`max-aspect-ratio: 3/4`), with the text below the video. Both are muted and captionless; the
+  full film (`film-1080` / `film-720`, with sound and its open captions) opens from "צפו בסרטון".
 - Images used on the site go in `src/assets/img/`; Astro generates AVIF/WebP at build time.
-- Encoded videos go in `public/media/` via `scripts/process-media.sh`.
+- Encoded videos go in `public/media/`.
 
 ## Deployment (uPress)
 

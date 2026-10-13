@@ -24,6 +24,47 @@ const ok = (name, cond, extra = '') => results.push(`${cond ? '✓' : '✗'} ${n
   }));
   ok('motion layer booted', state.motion && state.ready, JSON.stringify(state));
   ok('hero title visible after intro', state.titleVisible === 'visible');
+
+  // hero film: the wide cut plays muted, reframes per shot, and has a working pause button
+  const hero = await page.evaluate(async () => {
+    const v = document.querySelector('[data-hero] video');
+    const before = { src: v.currentSrc, paused: v.paused, muted: v.muted, playing: v.closest('[data-bg-video]').classList.contains('is-playing') };
+    v.currentTime = 10.5; // inside a shot framed at 100%
+    await new Promise((r) => setTimeout(r, 700));
+    return { ...before, x: v.style.getPropertyValue('--x'), progress: document.querySelector('[data-video-progress]').style.transform };
+  });
+  ok('hero film plays (wide cut, muted)', /hero-d\.(webm|mp4)$/.test(hero.src) && !hero.paused && hero.muted && hero.playing, JSON.stringify(hero));
+  ok('hero film reframes by shot', hero.x === '100%' && /scaleX/.test(hero.progress), `x=${hero.x} ${hero.progress}`);
+  await page.click('[data-video-toggle="hero-video"]');
+  const paused = await page.evaluate(() => ({
+    paused: document.querySelector('[data-hero] video').paused,
+    label: document.querySelector('[data-video-toggle="hero-video"] [data-label]').textContent,
+  }));
+  ok('hero pause button pauses', paused.paused && paused.label === 'הפעלת סרטון הרקע', JSON.stringify(paused));
+  await page.click('[data-video-toggle="hero-video"]');
+  await page.waitForTimeout(400);
+  ok('hero pause button resumes', await page.evaluate(() => !document.querySelector('[data-hero] video').paused));
+
+  // the full film opens in a dialog, pauses the hero, and gives focus back when closed
+  await page.click('[data-film-open]');
+  await page.waitForTimeout(500);
+  const film = await page.evaluate(() => ({
+    open: document.querySelector('dialog[data-film]').open,
+    modal: document.documentElement.dataset.modal,
+    src: document.querySelector('[data-film-video]').getAttribute('src'),
+    heroPaused: document.querySelector('[data-hero] video').paused,
+  }));
+  ok('film dialog opens with the large file', film.open && film.modal === 'open' && film.src === '/media/film-1080.mp4' && film.heroPaused, JSON.stringify(film));
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(500);
+  const closed = await page.evaluate(() => ({
+    open: document.querySelector('dialog[data-film]').open,
+    modal: document.documentElement.dataset.modal ?? null,
+    focus: document.activeElement?.hasAttribute('data-film-open'),
+    heroPaused: document.querySelector('[data-hero] video').paused,
+    filmPaused: document.querySelector('[data-film-video]').paused,
+  }));
+  ok('film dialog closes on Escape, focus returns, hero resumes', !closed.open && !closed.modal && closed.focus && !closed.heroPaused && closed.filmPaused, JSON.stringify(closed));
   // solutions panel opens on click
   await page.click('[data-panel-toggle]');
   ok('solutions panel opens', await page.isVisible('#solutions-panel'));
@@ -39,7 +80,7 @@ const ok = (name, cond, extra = '') => results.push(`${cond ? '✓' : '✗'} ${n
     const active = [...document.querySelectorAll('[data-theme-screen].is-active')].map((s) => s.dataset.themeScreen);
     return { checked, active };
   });
-  ok('switch screen changes', sw.checked === 'shutters' && sw.active.includes('shutters'), JSON.stringify(sw));
+  ok('switch screen changes', sw.checked === 'kids' && sw.active.includes('kids'), JSON.stringify(sw));
   // dimmer
   await page.locator('[data-dimmer-level]').scrollIntoViewIfNeeded();
   await page.locator('[data-dimmer-level]').fill('30');
@@ -68,6 +109,17 @@ const ok = (name, cond, extra = '') => results.push(`${cond ? '✓' : '✗'} ${n
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto(base, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(1500);
+  const heroM = await page.evaluate(() => ({
+    src: document.querySelector('[data-hero] video').currentSrc,
+    poster: document.querySelector('[data-hero] img').currentSrc,
+  }));
+  ok('phones get the 4:5 cut and poster', /hero-m\.(webm|mp4)$/.test(heroM.src) && /hero-poster-m/.test(heroM.poster), JSON.stringify(heroM));
+  await page.tap('[data-film-open]');
+  await page.waitForTimeout(400);
+  ok('phones get the 720p film', (await page.evaluate(() => document.querySelector('[data-film-video]').getAttribute('src'))) === '/media/film-720.mp4');
+  await page.tap('[data-film-close]');
+  await page.waitForTimeout(300);
   await page.tap('[data-menu-toggle]');
   ok('mobile menu opens', await page.isVisible('#mobile-menu'));
   const inert = await page.evaluate(() => document.querySelector('main').inert);

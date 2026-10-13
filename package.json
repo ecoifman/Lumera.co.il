@@ -8,8 +8,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check:links": "node scripts/check-links.mjs",
-    "media": "bash scripts/process-media.sh"
+    "media": "bash scripts/process-media.sh",
+    "media:film": "python3 scripts/build-film-media.py"
   },
   "engines": {
     "node": ">=22.12.0"

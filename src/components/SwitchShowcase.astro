@@ -1,6 +1,7 @@
 ---
-// The L10 switch with its screens. Picking a screen is a real interaction:
-// the new screen spreads out from the point of touch (see ui.ts).
+// The L10 wall screen in four rooms, each with its own design theme. Picking a
+// room is a real interaction: the new screen spreads out from the point of touch
+// (see initSwitchThemes in ui.ts). The frames come from the explainer film.
 import { Picture } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 
@@ -28,9 +29,9 @@ const { screens, headingLevel: H = 'h2', showLink = true } = Astro.props;
               src={s.image}
               alt={s.alt}
               formats={['avif', 'webp']}
-              widths={[480, 720, 960, 1280]}
+              widths={[480, 720, 960, 1200]}
               sizes="(max-width: 64rem) 90vw, 46vw"
-              loading={i === 0 ? 'lazy' : 'lazy'}
+              loading="lazy"
             />
           </div>
         ))
@@ -40,10 +41,10 @@ const { screens, headingLevel: H = 'h2', showLink = true } = Astro.props;
     <div class="showcase__copy">
       <H id="switch-title" class="display-3" data-reveal="lines">מתג אחד שיודע להיות הכול</H>
       <p class="lead showcase__lead">
-        סדרת <bdi>L10</bdi> היא מסך מגע על הקיר: מתג תאורה, מעמעם, שלט לתריסים ולמזגן ומפעיל סצנות, ביחידה אחת. חיישן קרבה מעיר את המסך כשמתקרבים, והכיתוב בעברית משתנה מתי שרוצים.
+        סדרת <bdi>L10</bdi> היא מסך מגע על הקיר: מתג תאורה, מעמעם, שלט לתריסים ולמזגן ומפעיל סצנות, ביחידה אחת. חיישן קרבה מעיר את המסך כשמתקרבים, והכיתוב בעברית משתנה מתי שרוצים. ולכל חדר אפשר לבחור עיצוב משלו.
       </p>
 
-      <div class="showcase__picker" role="radiogroup" aria-label="מה המסך מציג">
+      <div class="showcase__picker" role="radiogroup" aria-label="בחרו חדר">
         {
           screens.map((s, i) => (
             <button type="button" role="radio" aria-checked={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-theme={s.id}>
@@ -73,7 +74,7 @@ const { screens, headingLevel: H = 'h2', showLink = true } = Astro.props;
   }
   .showcase__stage {
     position: relative;
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 3 / 2;
     border-radius: var(--radius-panel);
     overflow: hidden;
     background: var(--plaster-2);
@@ -148,9 +149,6 @@ const { screens, headingLevel: H = 'h2', showLink = true } = Astro.props;
   @media (max-width: 64rem) {
     .showcase__grid {
       grid-template-columns: minmax(0, 1fr);
-    }
-    .showcase__stage {
-      aspect-ratio: 1 / 1;
     }
   }
 </style>

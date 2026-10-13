@@ -1,0 +1,132 @@
+---
+// The six solution areas, straight under the film: a quiet index on glass.
+// Each entry links to its page; a line of light runs along the top on hover,
+// like a recessed track coming on. This is also the target of "/#solutions".
+import { SOLUTIONS } from '../data/site';
+---
+
+<section class="solutions surface-dark" id="solutions" aria-labelledby="solutions-title">
+  <div class="wrap">
+    <div class="solutions__head">
+      <h2 id="solutions-title" class="solutions__title">פתרונות לבית חכם</h2>
+      <p class="solutions__sub">מהמתג שעל הקיר ועד התשתית שמאחוריו.</p>
+    </div>
+    <ol class="solutions__list">
+      {
+        SOLUTIONS.map((s) => (
+          <li>
+            <a class="solution" href={s.href}>
+              <span class="solution__name">{s.label}</span>
+              {s.description && <span class="solution__text">{s.description}</span>}
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .solutions {
+    position: relative;
+    padding-block: clamp(3.5rem, 7vw, 6rem) clamp(3.5rem, 6vw, 5rem);
+  }
+  .solutions__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 2rem;
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+  }
+  .solutions__title {
+    font-size: var(--step-3);
+  }
+  .solutions__sub {
+    color: var(--stone-on-dark);
+  }
+
+  .solutions__list {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0 var(--gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .solutions__list li {
+    display: flex;
+  }
+
+  .solution {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 0.45rem;
+    width: 100%;
+    padding-block: 1.4rem 0.5rem;
+    color: var(--plaster);
+    text-decoration: none;
+  }
+  /* the track: a hairline that fills with light from the reading edge */
+  .solution::before,
+  .solution::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    height: 1px;
+  }
+  .solution::before {
+    background: var(--line-on-dark);
+  }
+  .solution::after {
+    height: 2px;
+    top: -0.5px;
+    background: linear-gradient(to left, var(--lumen-hot), var(--lumen));
+    box-shadow: 0 0 14px var(--lumen-glow);
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform 0.7s var(--ease-dimmer);
+  }
+  .solution:hover::after,
+  .solution:focus-visible::after {
+    transform: scaleX(1);
+  }
+  .solution:focus-visible {
+    outline-offset: 6px;
+  }
+
+  .solution__name {
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    line-height: 1.2;
+  }
+  .solution__text {
+    color: var(--stone-on-dark);
+    font-size: 0.92rem;
+    line-height: 1.55;
+    transition: color 0.4s var(--ease-out);
+  }
+  .solution:hover .solution__text,
+  .solution:focus-visible .solution__text {
+    color: rgb(230 230 225 / 0.8);
+  }
+
+  @media (max-width: 80rem) {
+    .solutions__list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      row-gap: 1.75rem;
+    }
+  }
+  @media (max-width: 40rem) {
+    .solutions__list {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: 0;
+    }
+    .solution {
+      gap: 0.2rem;
+      padding-block: 1.1rem 1.15rem;
+    }
+  }
+</style>
