@@ -43,6 +43,20 @@ Node 22.12+ is required (Astro 7).
 - `src/scripts/motion/` – GSAP + ScrollTrigger + SplitText + Lenis; loaded only when motion is allowed
 - `src/pages/sitemap.xml.ts` – `/sitemap.xml` built from the page files
 
+## Design skills (vendored in `.claude/`)
+
+- `.claude/skills/impeccable` – Impeccable 4.5.2 (github.com/pbakaus/impeccable @2f98774,
+  Apache-2.0). Use as `/impeccable <command> [target]`. Run
+  `.claude/skills/impeccable/scripts/impeccable context` once per session (the launcher fetches its
+  engine into `~/.impeccable/bin` on first run), and after UI edits run
+  `.claude/skills/impeccable/scripts/impeccable detect --json <changed files>` once. Product truth
+  lives in `PRODUCT.md`, the visual system in `DESIGN.md`. Its subagents are in `.claude/agents/`.
+- Emil Kowalski's skills (github.com/emilkowalski/skill @2d22863, MIT): `emil-design-eng` (main),
+  `animate`, `review-animations`, `improve-animations`, `find-animation-opportunities`,
+  `animation-performance`, `animation-vocabulary`, `apple-design`, `mobile-native`, `break-ui`,
+  `prototype`.
+- To update, copy the folders again from those repos and record the new commit here.
+
 ## Design rules
 
 - Two materials: plaster `#e6e6e1` (light surfaces) and glass `#1b1f21` (dark surfaces).
